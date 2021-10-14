@@ -180,6 +180,7 @@ struct Statement
 		return condition.empty() && seqBody.empty();
 	}
 	void reversedCondition() {
+		// ×Ö·û´®´¦Àí
 		if (condition.contains("not")) {
 			condition.remove("not");
 			condition = condition.trimmed();
