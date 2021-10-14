@@ -1,21 +1,23 @@
 #pragma once
+#include <iostream>
+#include <string>
+#include <map>
+#include <list>
+#include <vector>
 
-#include <QtWidgets/QMainWindow>
-#include "ui_impqt.h"
+// 正则表达式库
+#include <regex> 
 
-class ImpQt : public QMainWindow
+using namespace std;
+
+class ImpKs
 {
-    Q_OBJECT
 
 public:
-    ImpQt(QWidget *parent = Q_NULLPTR);
-    
-private slots:
+	ImpKs();
     void onStart();
 
 private:
-    void showTip(const QString& tip);
+    void showTip(const string& tip);
 
-private:
-    Ui::impqtClass ui;
 };

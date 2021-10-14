@@ -1,19 +1,15 @@
-/**
-* impqt.cpp 主要业务文件，IMP语言分析.
-* \a 卢璐，潘丹，冯刚
-* \f 包含代码输入，代码解析，代码
-* \u 2021/05/10
-*/
-
 #include "imp_ks.h"
 
-#include <QRegularExpression>
-#include <QMap>
-#include <QLabel>
-#include <QPainter>
-#include <QList>
-#include <QMessageBox>
+#include <iostream>
+#include <string>
+#include <map>
+#include <list>
+#include <vector>
 
+// 正则表达式库
+#include <regex> 
+
+using namespace std;
 
 /*
 * 支持的语法：
@@ -63,7 +59,7 @@
 * \a g_input 可以通过修改该值来添加更多的测试用例，测试用例
 *  需要满足IMP语法规则。
 */
-const QString g_input[] = {
+const string g_input[] = {
 R"(a=0;
 b=2;
 while a<b do
@@ -149,20 +145,20 @@ struct Variable
 		Int = 0,
 		Boolean
 	};
-	QString toString(bool isPost = false) const {
+	string toString(bool isPost = false) const {
 		if ( !isPost )
-			return QString("%1=%2").arg(name).arg(value);
+			return string("%1=%2").arg(name).arg(value);
 		else
-			return QString("%1'=%2").arg(name).arg(value);
+			return string("%1'=%2").arg(name).arg(value);
 	}
 	Type  type;
-	QChar name;
+	char name;
 	int   value;
 };
 
 struct Statement;
-using Statements = QList<Statement>;
-using Variables = QList<Variable>;
+using Statements = list<Statement>;
+using Variables = list<Variable>;
 
 /**
                                                                       
@@ -170,7 +166,7 @@ using Variables = QList<Variable>;
 struct Statement
 {
 	bool isNull() const {
-		return condition.isEmpty() && seqBody.isEmpty();
+		return condition.empty() && seqBody.empty();
 	}
 	void reversedCondition() {
 		if (condition.contains("not")) {
@@ -178,17 +174,17 @@ struct Statement
 			condition = condition.trimmed();
 		}
 		else {
-			condition = QString("not %1").arg(condition);
+			condition = string("not %1").arg(condition);
 		}
 	}
 	StatementType type;  //语句类型
-	QString label;       //语句标签
-	QString condition;
-	QString seqBody;
+	string label;       //语句标签
+	string condition;
+	string seqBody;
 	Statements ifBody;
 	Statements elseBody;
 	Statements whileBody;
-	QList<Variable>  vars;
+	list<Variable>  vars;
 };
 
 
@@ -197,68 +193,68 @@ struct Statement
   \a preLable 前置标签
   \a postLable 后置标签
   \a condition 条件
-  \a QString opr 操作
-  \a QList<Variable> vars;
+  \a string opr 操作
+  \a list<Variable> vars;
 */
 struct FirstOrderLogical
 {
 public:
 	bool isNull() const {
-		return preLable.isEmpty() && postLable.isEmpty();
+		return preLable.empty() && postLable.empty();
 	}
 
-	static QString findAssignVariable(const QString& statement) {
+	static string findAssignVariable(const string& statement) {
 		QRegularExpression re("(\\w+)\\s*=\\s*");
 		QRegularExpressionMatch match = re.match(statement);
 		if (match.hasMatch()) {
-			QString s = match.captured(1);
+			string s = match.captured(1);
 			return match.captured(1);
 		}
 		else {
-			return QString();
+			return string();
 		}
 	}
 
-	QString toString() const {
-		if (!condition.isEmpty()) {
-			return QString("pc=%1 and pc'=%2 and (%3) and SAME(V)").arg(preLable).arg(postLable).arg(condition);
+	string toString() const {
+		if (!condition.empty()) {
+			return string("pc=%1 and pc'=%2 and (%3) and SAME(V)").arg(preLable).arg(postLable).arg(condition);
 		}
 		else {
-			QString tmp = QString("pc=%1 and pc'=%2 and (%3)").arg(preLable).arg(postLable).arg(opr);
-			QString var = findAssignVariable(opr);
-			if (var.isEmpty()) {
+			string tmp = string("pc=%1 and pc'=%2 and (%3)").arg(preLable).arg(postLable).arg(opr);
+			string var = findAssignVariable(opr);
+			if (var.empty()) {
 				tmp += " and SAME(V)";
 			}
 			else {
-				tmp += QString(" and SAME(V\\{%1})").arg(var);
+				tmp += string(" and SAME(V\\{%1})").arg(var);
 			}
 			return tmp;
 		}
 	}
 
-	QString valueToString() const {
-		QString tmp;
+	string valueToString() const {
+		string tmp;
 		for (const auto &v : vars) {
-			if (!tmp.isEmpty()) {
+			if (!tmp.empty()) {
 				tmp += ",";
 			}
-			tmp += QString("%1=%2").arg(v.name).arg(v.value);
+			tmp += string("%1=%2").arg(v.name).arg(v.value);
 		}
 		return tmp;
 	}
 
-	QPair<QChar, int> assign()  const {
-		if (opr.isEmpty() || !opr.contains('=')) {
-			return QPair<QChar, int>();
+	pair<char, int> assign()  const {
+		if (opr.empty() || !opr.contains('=')) {
+			return pair<char, int>();
 		}
 
 		QRegularExpression re("(\\w)\\s*=\\s*(\\w)\\s*([\\*+-])\\s*(\\w)");
 		QRegularExpressionMatch match = re.match(opr);
 		if (match.hasMatch()) {
-			QChar ret = match.captured(1).at(0);
-			QChar left = match.captured(2).at(0);
-			QChar midOpr = match.captured(3).at(0);
-			QChar right = match.captured(4).at(0);
+			char ret = match.captured(1).at(0);
+			char left = match.captured(2).at(0);
+			char midOpr = match.captured(3).at(0);
+			char right = match.captured(4).at(0);
 
 			int nLeft = getVarValue(left);
 			int nRight = getVarValue(right);
@@ -273,30 +269,30 @@ public:
 				nRet = (nLeft - nRight + 3) % ModValue;
 			}
 			
-			return QPair<QChar, int>(ret, nRet);
+			return pair<char, int>(ret, nRet);
 		}
 
 		re.setPattern("(\\w+)\\s*=\\s*(\\d+)");
 		match = re.match(opr);
 		if (match.hasMatch()) {
-			return QPair<QChar, int>{ match.captured(1).at(0), match.captured(2).toInt()};
+			return pair<char, int>{ match.captured(1).at(0), match.captured(2).toInt()};
 		}
-		return QPair<QChar, int>();
+		return pair<char, int>();
 	}
 
 	bool hasAssign() const {
-		if (!condition.isEmpty() || opr.isEmpty()) {
+		if (!condition.empty() || opr.empty()) {
 			return false;
 		}
-		QString var = findAssignVariable(opr);
-		if (var.isEmpty())
+		string var = findAssignVariable(opr);
+		if (var.empty())
 			return false;
 
 		return true;
 	}
 
 	bool isConditionOk() const {
-		if (condition.isEmpty())
+		if (condition.empty())
 			return true;
 		if (0 == condition.compare("true", Qt::CaseInsensitive))
 			return true;
@@ -304,7 +300,7 @@ public:
 			return false;
 
 		bool hasNot = false;
-		QString conditionNew = condition;
+		string conditionNew = condition;
 		if (conditionNew.contains("not")) {
 			hasNot = true;
 			conditionNew.remove("not");
@@ -314,9 +310,9 @@ public:
 		QRegularExpressionMatch match = re.match(conditionNew);
 		assert(match.hasMatch());
 
-		QChar varLeft = match.captured(1).at(0);
-		QString midOpr = match.captured(2);
-		QChar varRight = match.captured(3).at(0);
+		char varLeft = match.captured(1).at(0);
+		string midOpr = match.captured(2);
+		char varRight = match.captured(3).at(0);
 
 		int left = getVarValue(varLeft);
 		int right = getVarValue(varRight);
@@ -342,9 +338,9 @@ public:
 		return hasNot ? !res : res;
 	}
 
-	int getVarValue(const QChar var) const {
+	int getVarValue(const char var) const {
 		if (var.isNumber()) {
-			return QString("%1").arg(var).toInt();
+			return string("%1").arg(var).toInt();
 		}
 
 		for (const auto& v : vars) {
@@ -354,28 +350,28 @@ public:
 		return 0;
 	}
 
-	QString preLable;
-	QString postLable;
-	QString condition;
-	QString opr;
-	QList<Variable> vars;
+	string preLable;
+	string postLable;
+	string condition;
+	string opr;
+	list<Variable> vars;
 };
 
 
 //KS 中的R结构
 struct KsR
 {
-	QString preLabel;
-	QString postLabel;
+	string preLabel;
+	string postLabel;
 	Variables preVars;
 	Variables postVars;
-	QString opr;
+	string opr;
 
-	QString toString() const {
-		if (opr.isEmpty() && preLabel.isEmpty() && postLabel.isEmpty() )
-			return QString();
+	string toString() const {
+		if (opr.empty() && preLabel.empty() && postLabel.empty() )
+			return string();
 
-		QStringList unknowndVars;
+		list<string> unknowndVars;
 		for (const auto &v : postVars) {
 			bool conatins = false;
 			for (const auto& vPre : preVars) {
@@ -388,9 +384,9 @@ struct KsR
 				unknowndVars.push_back(v.name);
 		}
 
-		QString tmp;
+		string tmp;
 		tmp += "(pc=";
-		tmp += preLabel.isEmpty() ? "U" : preLabel ;
+		tmp += preLabel.empty() ? "U" : preLabel ;
 
 		for (const auto& v : preVars) {
 			tmp += ",";
@@ -400,11 +396,11 @@ struct KsR
 		//加进入未定义的变量
 		for (const auto& v : unknowndVars) {
 			tmp += ",";
-			tmp += QString("%1=u").arg(v);
+			tmp += string("%1=u").arg(v);
 		}
 		
 		tmp += ") -> (pc'=";
-		tmp += postLabel.isEmpty() ? "U" : postLabel;
+		tmp += postLabel.empty() ? "U" : postLabel;
 
 		int n = 0;
 		for (const auto& v : postVars) {
@@ -426,19 +422,19 @@ struct KsR
 
 //解析出并发的代码段
 //如果之后一个代码段，说明没有并发，退化到单线程执行
-QStringList parseCoProcesses( const QString &text ) {
-	QStringList processes;
-	QStringList processTags;  //代码段标签
+list<string> parseCoProcesses( const string &text ) {
+	list<string> processes;
+	list<string> processTags;  //代码段标签
 	QRegularExpression re("cobegin(.+)coend");
 	QRegularExpressionMatch match = re.match(text);
 	if (match.hasMatch()) {
-		QString processTmp = match.captured(1);
+		string processTmp = match.captured(1);
 		processTmp.remove(' ');
 		processTags = processTmp.split("||");
 	}
 
 	//如果没有并行程序，则整个输入就是一个单线程执行的程序
-	if (processTags.isEmpty()) {
+	if (processTags.empty()) {
 		return processes << text;
 	}
 
@@ -447,7 +443,7 @@ QStringList parseCoProcesses( const QString &text ) {
 		re.setPattern(v + "::([^:]+)");
 		match = re.match(text);
 		if (match.hasMatch()) {
-			QString split = match.captured(1);
+			string split = match.captured(1);
 			split = split.left(split.lastIndexOf(';') + 1);
 			split = split.trimmed();
 			processes << split;
@@ -458,9 +454,9 @@ QStringList parseCoProcesses( const QString &text ) {
 }
 
 //解析 wait 语句
-Statement parseWait(const QString& input) {
+Statement parseWait(const string& input) {
 	Statement sm;
-	QString condition;
+	string condition;
 	QRegularExpression re("wait\\((.+)\\)");
 	QRegularExpressionMatch match = re.match(input);
 	condition = match.captured(1).trimmed();
@@ -472,10 +468,10 @@ Statement parseWait(const QString& input) {
 }
 
 //解析顺序语句
-Statements parseSequence( const QString &input ) {
+Statements parseSequence( const string &input ) {
 	Statements sms;
-	QString inputTrimmed = input.trimmed();
-	QStringList list = inputTrimmed.split(';', Qt::SkipEmptyParts);
+	string inputTrimmed = input.trimmed();
+	list<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
 	for (auto& v : list) {
 		Statement sm;
 		v = v.trimmed();
@@ -492,14 +488,14 @@ Statements parseSequence( const QString &input ) {
 	return sms;
 }
 
-bool parseStatements(const QString& input, Statements& statements);
+bool parseStatements(const string& input, Statements& statements);
 
 //解析 if 语句
-Statement parseIf(const QString& input) {
+Statement parseIf(const string& input) {
 	Statement sm;
-	QString inputNew = input;
+	string inputNew = input;
 	inputNew.remove('\n');
-	QString condition, ifBody, elseBody;
+	string condition, ifBody, elseBody;
 	
 	if (input.contains("else")) {
 		QRegularExpression re("if(.+)then(.+)else(.+)endif;", QRegularExpression::MultilineOption);
@@ -525,11 +521,11 @@ Statement parseIf(const QString& input) {
 }
 
 //解析while语句
-Statement parseWhile(const QString& input) {
-	QString inputNew = input;
+Statement parseWhile(const string& input) {
+	string inputNew = input;
 	inputNew.remove('\n');
 	Statement sm;
-	QString condition, body;
+	string condition, body;
 	QRegularExpression re("while(.+)do(.+)end");
 	QRegularExpressionMatch match = re.match(inputNew);
 	condition = match.captured(1).trimmed();
@@ -554,15 +550,15 @@ static FirstOrderLogical toFormula(const Statement& pre, const Statement& post) 
 }
 
 //将所有语句转换为逻辑公式
-QList<FirstOrderLogical> toFormula(const Statements& statements, Statement &out = Statement()) {
-	if (statements.isEmpty())
-		return QList<FirstOrderLogical>();
-	if (out.label.isEmpty()) {
-		QString prefix = statements.at(0).label.left(1);
+list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out = Statement()) {
+	if (statements.empty())
+		return list<FirstOrderLogical>();
+	if (out.label.empty()) {
+		string prefix = statements.at(0).label.left(1);
 		out.label = prefix + "E";
 	}
 
-	QList<FirstOrderLogical> list;
+	list<FirstOrderLogical> list;
 	for (int i = 0; i < statements.size(); ++i) {
 		Statement postSm = out;
 		Statement sm = statements[i];
@@ -571,18 +567,18 @@ QList<FirstOrderLogical> toFormula(const Statements& statements, Statement &out 
 		}
 
 		if (sm.type == StatementType::If) {
-			if (!sm.ifBody.isEmpty()) {
+			if (!sm.ifBody.empty()) {
 				list << toFormula(sm, sm.ifBody.first());
 				list << toFormula(sm.ifBody, postSm);
 			}
-			if (!sm.elseBody.isEmpty()) {
+			if (!sm.elseBody.empty()) {
 				sm.reversedCondition();
 				list << toFormula(sm, sm.elseBody.first());
 				list << toFormula(sm.elseBody, postSm);
 			}
 		}
 		else if (sm.type == StatementType::While) {
-			if (!sm.whileBody.isEmpty()) {
+			if (!sm.whileBody.empty()) {
 				list << toFormula(sm, sm.whileBody.first());
 				list << toFormula(sm.whileBody, sm);
 			}
@@ -606,8 +602,8 @@ QList<FirstOrderLogical> toFormula(const Statements& statements, Statement &out 
 //用于绘图的窗口
 class KsGraphicDrawer: public QLabel {
 public:
-	KsGraphicDrawer( const QStringList &lables, 
-		const QList<QPair<QString, QString>> & relations ) 
+	KsGraphicDrawer( const list<string> &lables, 
+		const list<pair<string, string>> & relations ) 
 		: _labels(lables)
 		, _relations(relations)
 	{
@@ -617,9 +613,9 @@ protected:
 	void paintEvent(QPaintEvent*);
 
 private:
-	QList<QPair<QString, QString>> _relations;
-	QStringList _labels;
-	QMap<QString, QRectF> _labelsGem;
+	list<pair<string, string>> _relations;
+	list<string> _labels;
+	QMap<string, QRectF> _labelsGem;
 };
 
 //绘制箭头
@@ -661,7 +657,7 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 			}
 			QRect rect(n1 * (w+hSpan), yPos, size.width(), size.height());
 			painter.drawEllipse(rect);
-			painter.drawText(rect, Qt::AlignCenter, _labels.at(n).isEmpty() ? "Begin": _labels.at(n));
+			painter.drawText(rect, Qt::AlignCenter, _labels.at(n).empty() ? "Begin": _labels.at(n));
 			_labelsGem[_labels.at(n)] = rect;
 			++n;
 		}
@@ -670,7 +666,7 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 	//绘制关系箭头
 	for (const auto& v : _relations) {
 		//结束标签
-		if( v.second.isEmpty() )
+		if( v.second.empty() )
 			continue;
 
 		//自调用
@@ -702,8 +698,7 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 
 
 //构造,初始化业务类
-ImpQt::ImpQt(QWidget *parent)
-    : QMainWindow(parent)
+ImpKs::ImpKs()
 {
     ui.setupUi(this);
 
@@ -731,7 +726,7 @@ ImpQt::ImpQt(QWidget *parent)
 		});
 
 	//开始执行
-	connect(ui.actionBuild, &QAction::triggered, this, &ImpQt::onStart);
+	connect(ui.actionBuild, &QAction::triggered, this, &ImpKs::onStart);
 
     //默认测试数据
     ui.inputEdit->setText(g_input[2]);
@@ -739,7 +734,7 @@ ImpQt::ImpQt(QWidget *parent)
 
 
 //将输入代码解析为语法树
-bool parseStatements(const QString& input, Statements& statements) {
+bool parseStatements(const string& input, Statements& statements) {
 	int s = 0;
 	int e = 0;
 	while (s < input.length())
@@ -747,7 +742,7 @@ bool parseStatements(const QString& input, Statements& statements) {
 		int pos = input.indexOf(QRegularExpression("(if|while)"), s);
 		if (-1 == pos) {
 			e = input.length();
-			QString inputSplit = input.mid(s, e - s);
+			string inputSplit = input.mid(s, e - s);
 			statements << parseSequence(inputSplit);
 			s = e;
 		}
@@ -772,7 +767,7 @@ bool parseStatements(const QString& input, Statements& statements) {
 	return true;
 }
 
-void changeValue(Variables &vars, QChar var, int value) {
+void changeValue(Variables &vars, char var, int value) {
 	bool find = false;
 	for (auto& v : vars) {
 		if (v.name == var) {
@@ -789,12 +784,12 @@ void changeValue(Variables &vars, QChar var, int value) {
 // 将所有语句打上标签
 // 一阶逻辑公式需要使用语句标签
 // 同时也可以用来展示带标签的代码段
-void labledStatements(const QChar& prefix, int& index, Statements& sms) {
-	if (sms.isEmpty()) {
+void labledStatements(const char& prefix, int& index, Statements& sms) {
+	if (sms.empty()) {
 		return;
 	}
 	for (auto& v : sms) {
-		v.label = QString("%1%2").arg(prefix).arg(index++);
+		v.label = string("%1%2").arg(prefix).arg(index++);
 		if (v.type == StatementType::If) {
 			labledStatements(prefix, index, v.ifBody);
 			labledStatements(prefix, index, v.elseBody);
@@ -806,21 +801,21 @@ void labledStatements(const QChar& prefix, int& index, Statements& sms) {
 }
 
 //给所有语句打上标签
-void labledStatements(QList<Statements> &smss) {
-	QChar prefix = 'A';
+void labledStatements(list<Statements> &smss) {
+	char prefix = 'A';
 	for (auto& sms : smss) {
 		int index = 0;
 		labledStatements(prefix, index, sms);
-		prefix = QChar(prefix.unicode() + 1);
+		prefix = char(prefix.unicode() + 1);
 	}
 }
 
-void statementToList(const Statements &sms, QStringList &list, QString &space=QString()) {
-	if (sms.isEmpty())
+void statementToList(const Statements &sms, list<string> &list, string &space=string()) {
+	if (sms.empty())
 		return;
 
-	QString SpaceNew = space + "    ";
-	QStringList ls;
+	string SpaceNew = space + "    ";
+	list<string> ls;
 	for (const auto& v : sms) {
 		if (v.type == StatementType::Squence) {
 			list << v.label + ": " + space + v.seqBody + ';';
@@ -843,7 +838,7 @@ void statementToList(const Statements &sms, QStringList &list, QString &space=QS
 	}
 }
 
-void ImpQt::showTip(const QString& tip)
+void ImpKs::showTip(const string& tip)
 {
 	QMessageBox::warning(Q_NULLPTR, "", tip);
 }
@@ -852,13 +847,13 @@ void ImpQt::showTip(const QString& tip)
 void nextVars(const Variables& src, FirstOrderLogical &dst) {
 	dst.vars.clear();
 	dst.vars = src;
-	QPair<QChar, int> pair = dst.assign();
+	pair<char, int> pair = dst.assign();
 	if (!pair.first.isNull())
 		changeValue(dst.vars, pair.first, pair.second);					
 }
 
 //计算下一步的位置，这里需要考虑条件
-FirstOrderLogical nextStep(QList <FirstOrderLogical> &lgs, FirstOrderLogical &cur) {
+FirstOrderLogical nextStep(list <FirstOrderLogical> &lgs, FirstOrderLogical &cur) {
 
 	FirstOrderLogical lg;
 	if (cur.isNull()) {
@@ -879,38 +874,38 @@ FirstOrderLogical nextStep(QList <FirstOrderLogical> &lgs, FirstOrderLogical &cu
 
 
 
-void createKsLables(QList<QList<FirstOrderLogical>>& lgss,
+void createKsLables(list<list<FirstOrderLogical>>& lgss,
 	//定义PC，指向当前执行的程序段
-	const QStringList& pcs,
-	QList<QPair<QString, QString>>& relations,
-	QStringList& labels,
-	QList<FirstOrderLogical>& lastLgs,
+	const list<string>& pcs,
+	list<pair<string, string>>& relations,
+	list<string>& labels,
+	list<FirstOrderLogical>& lastLgs,
 	//当前变量值
 	const Variables& vars,
-	QStringList &states,
-	QList<KsR> &Rs, int deep = 0) {
+	list<string> &states,
+	list<KsR> &Rs, int deep = 0) {
 
 	++deep;
-	QStringList tmp = pcs;
-	QList<FirstOrderLogical> lastLgsTmp = lastLgs;
+	list<string> tmp = pcs;
+	list<FirstOrderLogical> lastLgsTmp = lastLgs;
 	for (int i = 0; i < pcs.size(); ++i) {
 		//用户执行完之后恢复
 		KsR oneRs;
-		QString oldLabel = tmp.join(' ');
+		string oldLabel = tmp.join(' ');
 		oneRs.preLabel = oldLabel;
 
 		//只包含空格，则认为是空
-		QString oldTmp = oldLabel;
+		string oldTmp = oldLabel;
 		oldTmp.remove(' ');
-		if (oldTmp.isEmpty())
+		if (oldTmp.empty())
 			oldLabel.clear();
 
 		//执行完要恢复到上一步的状态
 		lastLgsTmp[i].vars = vars;
 		FirstOrderLogical lastLg = lastLgsTmp[i];
-		QString lastArgsStr = lastLgsTmp[i].valueToString();
+		string lastArgsStr = lastLgsTmp[i].valueToString();
 		oneRs.preVars = lastLgsTmp[i].vars;
-		if (!oldLabel.isEmpty() && !lastArgsStr.isEmpty() )
+		if (!oldLabel.empty() && !lastArgsStr.empty() )
 			oldLabel += ',' + lastArgsStr;
 
 		if (oldLabel.contains("A1") && !oldLabel.contains("B")) {
@@ -921,7 +916,7 @@ void createKsLables(QList<QList<FirstOrderLogical>>& lgss,
 		
 		tmp[i] = lastLgsTmp[i].postLable;
 		Variables newVars = lastLgsTmp[i].vars;
-		QString newLabel = tmp.join(' ');
+		string newLabel = tmp.join(' ');
 
 		//收集R变换
 		oneRs.postLabel = newLabel;
@@ -930,29 +925,29 @@ void createKsLables(QList<QList<FirstOrderLogical>>& lgss,
 		Rs << oneRs;
 
 		//收集状态S
-		QString oneState = lastLgsTmp[i].valueToString();
-		if (!oneState.isEmpty() && !states.contains(oneState)) {
+		string oneState = lastLgsTmp[i].valueToString();
+		if (!oneState.empty() && !states.contains(oneState)) {
 			states.push_back(oneState);
 		}
 
-		if (!newLabel.isEmpty() && !lastLgsTmp[i].valueToString().isEmpty())
+		if (!newLabel.empty() && !lastLgsTmp[i].valueToString().empty())
 			newLabel += ',' + lastLgsTmp[i].valueToString();
 
-		QPair<QString, QString> r{ oldLabel, newLabel };
+		pair<string, string> r{ oldLabel, newLabel };
 		if (relations.contains(r) ) {
 			tmp[i] = pcs.at(i);
 			lastLgsTmp[i] = lastLg;
 			continue;
 		}
 
-		if (!oldLabel.isEmpty() && !newLabel.isEmpty()) {
-			relations << QPair<QString, QString>{ oldLabel, newLabel };
+		if (!oldLabel.empty() && !newLabel.empty()) {
+			relations << pair<string, string>{ oldLabel, newLabel };
 		}	
-		if (!labels.contains(oldLabel) && !oldLabel.isEmpty()) {
+		if (!labels.contains(oldLabel) && !oldLabel.empty()) {
 			labels.push_back(oldLabel);
 		}
 
-		if (!labels.contains(newLabel) && !newLabel.isEmpty()) {
+		if (!labels.contains(newLabel) && !newLabel.empty()) {
 			labels.push_back(newLabel);
 		}
 		createKsLables(lgss, tmp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
@@ -961,18 +956,18 @@ void createKsLables(QList<QList<FirstOrderLogical>>& lgss,
 	}
 }
 
-bool checkInputOk(const QString& input) {
+bool checkInputOk(const string& input) {
 	return true;
 }
 
 
 //开始执行程序
-void ImpQt::onStart()
+void ImpKs::onStart()
 {
 	ui.outputEdit->clear();
 	ui.scrollArea->setWidget(Q_NULLPTR);
 
-	QString input = ui.inputEdit->toPlainText();
+	string input = ui.inputEdit->toPlainText();
 
 	//每次需要清除之前的输出
 	if (!checkInputOk(input)) {
@@ -981,9 +976,9 @@ void ImpQt::onStart()
 	}
 
 	//解析出所有程序段
-	QStringList processes = parseCoProcesses(input);
+	list<string> processes = parseCoProcesses(input);
 
-	QList<Statements> statements;
+	list<Statements> statements;
 	for (const auto& v : processes) {
 		Statements tmp;
 		parseStatements(v, tmp);
@@ -996,40 +991,40 @@ void ImpQt::onStart()
 	//输出带标签的代码
 	ui.outputEdit->append("Labeled function:\n");
 	for (const auto& v : statements) {
-		QStringList list;
+		list<string> list;
 		statementToList(v, list);
 		//添加一个结束标签
-		QString prefix = list.at(0).left(1);
+		string prefix = list.at(0).left(1);
 		list << prefix + "E:";
 		ui.outputEdit->append(list.join('\n'));
 		ui.outputEdit->append("\n\n");
 	}
 
 	//输出逻辑公式
-	QList<QList<FirstOrderLogical>> lgss;
+	list<list<FirstOrderLogical>> lgss;
 	ui.outputEdit->append("First order logical formula:");
 	bool hasPc = statements.size() > 1;
 	for (int i = 0; i < statements.size(); ++i) {
-		QList<FirstOrderLogical> formulas = toFormula(statements.at(i));
+		list<FirstOrderLogical> formulas = toFormula(statements.at(i));
 		lgss << formulas;
 		for (const auto& v : formulas) {
 			if (hasPc) {
-				QString pc = QString("pc%1").arg(i);
-				QString formulaNew = v.toString();
+				string pc = string("pc%1").arg(i);
+				string formulaNew = v.toString();
 				formulaNew.replace("pc", pc);
-				ui.outputEdit->append(QString("pc=%1 and %2").arg(pc).arg(formulaNew));
+				ui.outputEdit->append(string("pc=%1 and %2").arg(pc).arg(formulaNew));
 			}
 			else
 				ui.outputEdit->append(v.toString());
 		}
 	}
 
-	QStringList pcs;
-	QList<QPair<QString, QString>> relations;
-	QStringList lables;
-	QList<FirstOrderLogical> lastLgs;
-	QStringList states;
-	QList<KsR> Rs;
+	list<string> pcs;
+	list<pair<string, string>> relations;
+	list<string> lables;
+	list<FirstOrderLogical> lastLgs;
+	list<string> states;
+	list<KsR> Rs;
 	Variables vars;
 	for (const auto& v : lgss) {
 		if (lgss.size() > 1) {
@@ -1045,14 +1040,14 @@ void ImpQt::onStart()
 	ui.outputEdit->append("\n\nAll States:\n");
 	int index = 0;
 	for (const auto& v : lables) {
-		ui.outputEdit->append(QString("S%1:(%2)").arg(index++).arg(v));
+		ui.outputEdit->append(string("S%1:(%2)").arg(index++).arg(v));
 	}
 
 	ui.outputEdit->append("\n");
 	index = 0;
 	for (const auto& v : Rs) {
-		if( !v.toString().isEmpty() )
-			ui.outputEdit->append(QString("R%1:= %2").arg(index++).arg(v.toString()));
+		if( !v.toString().empty() )
+			ui.outputEdit->append(string("R%1:= %2").arg(index++).arg(v.toString()));
 	}
 	
 	//绘制KS图
