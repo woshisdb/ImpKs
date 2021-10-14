@@ -181,7 +181,7 @@ struct Statement
 	}
 	void reversedCondition() {
 		// 字符串处理
-		if (condition.contains("not")) {
+		if (condition.find("not")!=-1) {
 			condition.remove("not");
 			condition = condition.trimmed();
 		}
@@ -256,7 +256,7 @@ public:
 	}
 
 	pair<char, int> assign()  const {
-		if (opr.empty() || !opr.contains('=')) {
+		if (opr.empty() || !(opr.find('=') != -1)) {
 			return pair<char, int>();
 		}
 
@@ -313,7 +313,7 @@ public:
 
 		bool hasNot = false;
 		string conditionNew = condition;
-		if (conditionNew.contains("not")) {
+		if (conditionNew.find("not") != -1) {
 			hasNot = true;
 			conditionNew.remove("not");
 			conditionNew = conditionNew.trimmed();
@@ -488,7 +488,7 @@ Statements parseSequence( const string &input ) {
 		Statement sm;
 		v = v.trimmed();
 		//顺序语句里面可能会包含wait语句
-		if (v.contains("wait")) {
+		if (v.find("wait") != -1) {
 			sm = parseWait(input);
 		}
 		else {
@@ -509,7 +509,7 @@ Statement parseIf(const string& input) {
 	inputNew.remove('\n');
 	string condition, ifBody, elseBody;
 	
-	if (input.contains("else")) {
+	if (input.find("else") != -1) {
 		QRegularExpression re("if(.+)then(.+)else(.+)endif;", QRegularExpression::MultilineOption);
 		QRegularExpressionMatch match = re.match(inputNew);
 		Q_ASSERT(match.hasMatch());
@@ -884,6 +884,20 @@ FirstOrderLogical nextStep(list <FirstOrderLogical> &lgs, FirstOrderLogical &cur
 	return lg;
 }
 
+bool contains_list(list<string> l,string aim)//检查链表中是否有aim
+{
+	bool has = false;
+	list<string>::iterator it = l.begin();
+	for(;it!=l.end();it++)
+	{
+		if (aim==*it)
+		{
+			has = true;
+			break;
+		}
+	}
+	return has;
+}
 
 
 void createKsLables(list<list<FirstOrderLogical>>& lgss,
@@ -920,7 +934,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 		if (!oldLabel.empty() && !lastArgsStr.empty() )
 			oldLabel += ',' + lastArgsStr;
 
-		if (oldLabel.contains("A1") && !oldLabel.contains("B")) {
+		if (oldLabel.find("A1") != -1 && !(oldLabel.find("B")!=-1)) {
 			int a = 10;
 		}
 
@@ -938,6 +952,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 
 		//收集状态S
 		string oneState = lastLgsTmp[i].valueToString();
+		
 		if (!oneState.empty() && !states.contains(oneState)) {
 			states.push_back(oneState);
 		}
