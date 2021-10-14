@@ -5,11 +5,22 @@
 #include <map>
 #include <list>
 #include <vector>
-
+#include <memory>
+#include <cstdio>
 // 正则表达式库
 #include <regex> 
 
 using namespace std;
+
+
+template<typename ... Args>
+static std::string formatString(const std::string &format, Args ... args)
+{
+	auto size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+	std::unique_ptr<char[]> buf(new char[size]);
+	std::snprintf(buf.get(), size, format.c_str(), args ...);
+	return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+}
 
 /*
 * 支持的语法：
@@ -147,9 +158,9 @@ struct Variable
 	};
 	string toString(bool isPost = false) const {
 		if ( !isPost )
-			return string("%1=%2").arg(name).arg(value);
+			return formatString("%c=%d", name, value);
 		else
-			return string("%1'=%2").arg(name).arg(value);
+			return formatString("%c'=%d", name, value);
 	}
 	Type  type;
 	char name;
@@ -174,7 +185,7 @@ struct Statement
 			condition = condition.trimmed();
 		}
 		else {
-			condition = string("not %1").arg(condition);
+			condition = formatString("not %s", condition);
 		}
 	}
 	StatementType type;  //语句类型
@@ -217,16 +228,16 @@ public:
 
 	string toString() const {
 		if (!condition.empty()) {
-			return string("pc=%1 and pc'=%2 and (%3) and SAME(V)").arg(preLable).arg(postLable).arg(condition);
+			return formatString("pc=%s and pc'=%s and (%s) and SAME(V)", preLable, postLable, condition);
 		}
 		else {
-			string tmp = string("pc=%1 and pc'=%2 and (%3)").arg(preLable).arg(postLable).arg(opr);
+			string tmp = formatString("pc=%s and pc'=%s and (%s)", preLable, postLable, opr);
 			string var = findAssignVariable(opr);
 			if (var.empty()) {
 				tmp += " and SAME(V)";
 			}
 			else {
-				tmp += string(" and SAME(V\\{%1})").arg(var);
+				tmp += formatString(" and SAME(V\\{%s})", var);
 			}
 			return tmp;
 		}
@@ -238,7 +249,7 @@ public:
 			if (!tmp.empty()) {
 				tmp += ",";
 			}
-			tmp += string("%1=%2").arg(v.name).arg(v.value);
+			tmp += formatString("%c=%d", v.name, v.value);
 		}
 		return tmp;
 	}
@@ -340,7 +351,7 @@ public:
 
 	int getVarValue(const char var) const {
 		if (var.isNumber()) {
-			return string("%1").arg(var).toInt();
+			return formatString("%c", var).toInt();
 		}
 
 		for (const auto& v : vars) {
@@ -396,7 +407,7 @@ struct KsR
 		//加进入未定义的变量
 		for (const auto& v : unknowndVars) {
 			tmp += ",";
-			tmp += string("%1=u").arg(v);
+			tmp += formatString("%s=u", v);
 		}
 		
 		tmp += ") -> (pc'=";
@@ -789,7 +800,7 @@ void labledStatements(const char& prefix, int& index, Statements& sms) {
 		return;
 	}
 	for (auto& v : sms) {
-		v.label = string("%1%2").arg(prefix).arg(index++);
+		v.label = formatString("%c%d", prefix, index++);
 		if (v.type == StatementType::If) {
 			labledStatements(prefix, index, v.ifBody);
 			labledStatements(prefix, index, v.elseBody);
@@ -1009,10 +1020,10 @@ void ImpKs::onStart()
 		lgss << formulas;
 		for (const auto& v : formulas) {
 			if (hasPc) {
-				string pc = string("pc%1").arg(i);
+				string pc = formatString("pc%d", i);
 				string formulaNew = v.toString();
 				formulaNew.replace("pc", pc);
-				ui.outputEdit->append(string("pc=%1 and %2").arg(pc).arg(formulaNew));
+				ui.outputEdit->append(formatString("pc=%s and %s", pc, formulaNew));
 			}
 			else
 				ui.outputEdit->append(v.toString());
@@ -1040,14 +1051,14 @@ void ImpKs::onStart()
 	ui.outputEdit->append("\n\nAll States:\n");
 	int index = 0;
 	for (const auto& v : lables) {
-		ui.outputEdit->append(string("S%1:(%2)").arg(index++).arg(v));
+		ui.outputEdit->append(formatString("S%d:(%s)", index++, v));
 	}
 
 	ui.outputEdit->append("\n");
 	index = 0;
 	for (const auto& v : Rs) {
 		if( !v.toString().empty() )
-			ui.outputEdit->append(string("R%1:= %2").arg(index++).arg(v.toString()));
+			ui.outputEdit->append(formatString("R%d:= %s", index++, v.toString()));
 	}
 	
 	//绘制KS图
