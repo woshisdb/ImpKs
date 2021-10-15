@@ -992,7 +992,8 @@ void labledStatements(list<Statements> &smss) {
 	for (auto& sms : smss) {
 		int index = 0;
 		labledStatements(prefix, index, sms);
-		prefix = char(prefix.unicode() + 1);
+		//prefix = char(prefix.unicode() + 1);
+		prefix = char(prefix + 1);
 	}
 }
 //void statementToList(const Statements &sms, QStringList &list, QString &space=QString())
@@ -1192,7 +1193,7 @@ void ImpKs::onStart()
 		list<string> list;
 		statementToList(v, list);
 		//添加一个结束标签
-		string prefix = (*at(list,0)).left(1);
+		string prefix = (*at(list,0)).substr(0,1);
 		list .push_back( prefix + "E:");
 		//ui.outputEdit->append(list.join('\n'));
 		ui.outputEdit->append(jointList(list, "\n"));
