@@ -360,9 +360,11 @@ public:
 	bool isConditionOk() const {
 		if (condition.empty())
 			return true;
-		if (0 == condition.compare("true", Qt::CaseInsensitive))
+		//if (0 == condition.compare("true", Qt::CaseInsensitive))
+		if (condition== "true")
 			return true;
-		if (0 == condition.compare("false", Qt::CaseInsensitive))
+		//if (0 == condition.compare("false", Qt::CaseInsensitive))
+		if(condition== "false")
 			return false;
 
 		bool hasNot = false;
