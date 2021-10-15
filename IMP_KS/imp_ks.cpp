@@ -1070,7 +1070,9 @@ void ImpKs::onStart()
 		//添加一个结束标签
 		string prefix = list.at(0).left(1);
 		list << prefix + "E:";
-		ui.outputEdit->append(list.join('\n'));
+		//ui.outputEdit->append(list.join('\n'));
+		ui.outputEdit->append(jointList(list, "\n"));
+		
 		ui.outputEdit->append("\n\n");
 	}
 
