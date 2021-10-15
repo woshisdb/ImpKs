@@ -13,6 +13,59 @@
 using namespace std;
 
 
+bool contains_list(list<string> l, string aim)//检查链表中是否有aim
+{
+	bool has = false;
+	list<string>::iterator it = l.begin();
+	for (; it != l.end(); it++)
+	{
+		if (aim == *it)
+		{
+			has = true;
+			break;
+		}
+	}
+	return has;
+}
+bool contains_list(list<pair<string, string>> l, pair<string, string> aim)//检查链表中是否有aim
+{
+	bool has = false;
+	list<pair<string, string>>::iterator it = l.begin();
+	for (; it != l.end(); it++)
+	{
+		if (aim == *it)
+		{
+			has = true;
+			break;
+		}
+	}
+	return has;
+}
+
+string remove(string u, string v)
+{
+	int pos = u.find(v);
+	while (pos != -1)
+	{
+		u.erase(pos, v.length());
+		pos = u.find(v);
+	}
+	return u;
+}
+
+string jointList(list<string> l, string aim)
+{
+	string ret = *(l.begin());
+	list<string>::iterator it = l.begin();
+	for (it++; it != l.end(); it++)
+	{
+		ret += aim;
+		ret += *(it);
+	}
+	return ret;
+}
+
+
 template<typename ... Args>
 static std::string formatString(const std::string &format, Args ... args)
 {
@@ -182,8 +235,9 @@ struct Statement
 	void reversedCondition() {
 		// 字符串处理
 		if (condition.find("not")!=-1) {
-			condition.remove("not");
-			condition = condition.trimmed();
+			//condition.remove("not");
+			condition=remove(condition,"not");
+			//condition = condition.trimmed();
 		}
 		else {
 			condition = formatString("not %s", condition);
@@ -315,7 +369,8 @@ public:
 		string conditionNew = condition;
 		if (conditionNew.find("not") != -1) {
 			hasNot = true;
-			conditionNew.remove("not");
+			//conditionNew.remove("not");
+			conditionNew = remove(conditionNew, "not");
 			conditionNew = conditionNew.trimmed();
 		}
 		QRegularExpression re("(\\w)\\s*([><=andotr]+)\\s*(\\w)");
@@ -441,7 +496,8 @@ list<string> parseCoProcesses( const string &text ) {
 	QRegularExpressionMatch match = re.match(text);
 	if (match.hasMatch()) {
 		string processTmp = match.captured(1);
-		processTmp.remove(' ');
+		//processTmp.remove(' ');
+		processTmp = remove(processTmp, " ");
 		processTags = processTmp.split("||");
 	}
 
@@ -506,7 +562,8 @@ bool parseStatements(const string& input, Statements& statements);
 Statement parseIf(const string& input) {
 	Statement sm;
 	string inputNew = input;
-	inputNew.remove('\n');
+	//inputNew.remove('\n');
+	inputNew = remove(inputNew, "\n");
 	string condition, ifBody, elseBody;
 	
 	if (input.find("else") != -1) {
@@ -535,7 +592,8 @@ Statement parseIf(const string& input) {
 //解析while语句
 Statement parseWhile(const string& input) {
 	string inputNew = input;
-	inputNew.remove('\n');
+	//inputNew.remove('\n');
+	inputNew = remove(inputNew, "\n");
 	Statement sm;
 	string condition, body;
 	QRegularExpression re("while(.+)do(.+)end");
@@ -884,34 +942,6 @@ FirstOrderLogical nextStep(list <FirstOrderLogical> &lgs, FirstOrderLogical &cur
 	return lg;
 }
 
-bool contains_list(list<string> l,string aim)//检查链表中是否有aim
-{
-	bool has = false;
-	list<string>::iterator it = l.begin();
-	for(;it!=l.end();it++)
-	{
-		if (aim==*it)
-		{
-			has = true;
-			break;
-		}
-	}
-	return has;
-}
-bool contains_list(list<pair<string, string>> l, pair<string, string> aim)//检查链表中是否有aim
-{
-	bool has = false;
-	list<pair<string, string>>::iterator it = l.begin();
-	for (; it != l.end(); it++)
-	{
-		if (aim == *it)
-		{
-			has = true;
-			break;
-		}
-	}
-	return has;
-}
 
 
 void createKsLables(list<list<FirstOrderLogical>>& lgss,
@@ -931,12 +961,14 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 	for (int i = 0; i < pcs.size(); ++i) {
 		//用户执行完之后恢复
 		KsR oneRs;
-		string oldLabel = tmp.join(' ');
+		//string oldLabel = tmp.join(' ');
+		string oldLabel = jointList(tmp," ");
 		oneRs.preLabel = oldLabel;
 
 		//只包含空格，则认为是空
 		string oldTmp = oldLabel;
-		oldTmp.remove(' ');
+		oldTmp=remove(oldTmp," ");
+		//oldTmp.remove(' ');
 		if (oldTmp.empty())
 			oldLabel.clear();
 
@@ -956,7 +988,8 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 		
 		tmp[i] = lastLgsTmp[i].postLable;
 		Variables newVars = lastLgsTmp[i].vars;
-		string newLabel = tmp.join(' ');
+		//string newLabel = tmp.join(' ');
+		string newLabel = jointList(tmp, " ");
 
 		//收集R变换
 		oneRs.postLabel = newLabel;
