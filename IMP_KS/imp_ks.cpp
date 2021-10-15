@@ -898,6 +898,20 @@ bool contains_list(list<string> l,string aim)//检查链表中是否有aim
 	}
 	return has;
 }
+bool contains_list(list<pair<string, string>> l, pair<string, string> aim)//检查链表中是否有aim
+{
+	bool has = false;
+	list<pair<string, string>>::iterator it = l.begin();
+	for (; it != l.end(); it++)
+	{
+		if (aim == *it)
+		{
+			has = true;
+			break;
+		}
+	}
+	return has;
+}
 
 
 void createKsLables(list<list<FirstOrderLogical>>& lgss,
@@ -953,7 +967,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 		//收集状态S
 		string oneState = lastLgsTmp[i].valueToString();
 		
-		if (!oneState.empty() && !states.contains(oneState)) {
+		if (!oneState.empty() && !contains_list(states,oneState)) {
 			states.push_back(oneState);
 		}
 
@@ -961,7 +975,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			newLabel += ',' + lastLgsTmp[i].valueToString();
 
 		pair<string, string> r{ oldLabel, newLabel };
-		if (relations.contains(r) ) {
+		if (contains_list(relations,r)) {
 			tmp[i] = pcs.at(i);
 			lastLgsTmp[i] = lastLg;
 			continue;
@@ -970,11 +984,11 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 		if (!oldLabel.empty() && !newLabel.empty()) {
 			relations << pair<string, string>{ oldLabel, newLabel };
 		}	
-		if (!labels.contains(oldLabel) && !oldLabel.empty()) {
+		if (! contains_list(labels,oldLabel) && !oldLabel.empty()) {
 			labels.push_back(oldLabel);
 		}
 
-		if (!labels.contains(newLabel) && !newLabel.empty()) {
+		if (!contains_list(labels, newLabel)&& !newLabel.empty()) {
 			labels.push_back(newLabel);
 		}
 		createKsLables(lgss, tmp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
