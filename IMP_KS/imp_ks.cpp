@@ -12,25 +12,11 @@
 
 using namespace std;
 
-
-bool contains_list(list<string> l, string aim)//检查链表中是否有aim
+template<class nump,class sea>
+bool contains_list(nump l, sea aim)//检查链表中是否有aim
 {
 	bool has = false;
-	list<string>::iterator it = l.begin();
-	for (; it != l.end(); it++)
-	{
-		if (aim == *it)
-		{
-			has = true;
-			break;
-		}
-	}
-	return has;
-}
-bool contains_list(list<pair<string, string>> l, pair<string, string> aim)//检查链表中是否有aim
-{
-	bool has = false;
-	list<pair<string, string>>::iterator it = l.begin();
+	typename nump::iterator it = l.begin();
 	for (; it != l.end(); it++)
 	{
 		if (aim == *it)
@@ -64,13 +50,17 @@ string jointList(list<string> l, string aim)
 	}
 	return ret;
 }
-Statement find(list<Statement> u, int no)
+/*
+template<class findbas>
+findbas find(findbas u, int no)
 {
-	list<Statement>::iterator it = u.begin();
+	typename findbas::iterator it = u.begin();
 	for (int i = 0; i < no; i++, it++)
 	{}
 	return *it;
 }
+*/
+/*
 string find(list<string> u, int no)
 {
 	list<string>::iterator it = u.begin();
@@ -95,6 +85,18 @@ FirstOrderLogical find(list<FirstOrderLogical> u, int no)
 	}
 	return *it;
 }
+*/
+template<class container>//一个
+typename container::iterator at(container &u, int no)
+{
+	typename container::iterator it = u.begin();
+	for (int i = 0; i < no; i++, it++)
+	{
+
+	}
+	return it;
+}
+
 int lastIndexOf(string u,char v)
 {
 	for (int i = u.length - 1; i >= 0; i--)
@@ -733,7 +735,7 @@ list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out =
 		return list<FirstOrderLogical>();
 	if (out.label.empty()) {
 		//string prefix = statements.at(0).label.left(1);
-		string prefix = find(statements,0).label.substr(0, 1);
+		string prefix = (*at(statements,0)).label.substr(0, 1);
 		//split = split.substr(0, lastIndexOf(split, ';') + 1);//
 		out.label = prefix + "E";
 	}
@@ -742,10 +744,10 @@ list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out =
 	for (int i = 0; i < statements.size(); ++i) {
 		Statement postSm = out;
 		//Statement sm=statements[i];
-		Statement sm = find(statements, i);
+		Statement sm = *at(statements, i);
 		if (i + 1 < statements.size()) {
 			//postSm = statements.at(i + 1);
-			postSm = find(statements,i + 1);
+			postSm = *at(statements,i + 1);
 		}
 
 		if (sm.type == StatementType::If) {
@@ -840,8 +842,8 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 			QRect rect(n1 * (w+hSpan), yPos, size.width(), size.height());
 			painter.drawEllipse(rect);
 			//painter.drawText(rect, Qt::AlignCenter, _labels.at(n).empty() ? "Begin": _labels.at(n));
-			painter.drawText(rect, Qt::AlignCenter, find(_labels,n).empty() ? "Begin" : find(_labels,n));
-			_labelsGem[find(_labels,n)] = rect;
+			painter.drawText(rect, Qt::AlignCenter, (*at(_labels,n)).empty() ? "Begin" : *at(_labels,n));
+			_labelsGem[*at(_labels,n)] = rect;
 			++n;
 		}
 	}
@@ -1094,10 +1096,10 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			oldLabel.clear();
 
 		//执行完要恢复到上一步的状态
-		lastLgsTmp[i].vars = vars;
-		FirstOrderLogical lastLg = lastLgsTmp[i];
-		string lastArgsStr = lastLgsTmp[i].valueToString();
-		oneRs.preVars = lastLgsTmp[i].vars;
+		(*at(lastLgsTmp,i)).vars = vars;
+		FirstOrderLogical lastLg = *at(lastLgsTmp,i);
+		string lastArgsStr = (*at(lastLgsTmp,i)).valueToString();
+		oneRs.preVars = (*at(lastLgsTmp,i)).vars;
 		if (!oldLabel.empty() && !lastArgsStr.empty() )
 			oldLabel += ',' + lastArgsStr;
 
@@ -1105,33 +1107,33 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			int a = 10;
 		}
 
-		lastLgsTmp[i] = nextStep(find(lgss,i), find(lastLgsTmp,i));
+		*at(lastLgsTmp,i) = nextStep(*at(lgss,i),*at(lastLgsTmp,i));
 		
-		tmp[i] = lastLgsTmp[i].postLable;
-		Variables newVars = lastLgsTmp[i].vars;
+		*at(tmp,i)= (*at(lastLgsTmp,i)).postLable;
+		Variables newVars = (*at(lastLgsTmp,i)).vars;
 		//string newLabel = tmp.join(' ');
 		string newLabel = jointList(tmp, " ");
 
 		//收集R变换
 		oneRs.postLabel = newLabel;
-		oneRs.postVars = lastLgsTmp[i].vars;
-		oneRs.opr = lastLgsTmp[i].opr;
+		oneRs.postVars = (*at(lastLgsTmp,i)).vars;
+		oneRs.opr = (*at(lastLgsTmp,i)).opr;
 		Rs.push_back( oneRs);
 
 		//收集状态S
-		string oneState = lastLgsTmp[i].valueToString();
+		string oneState = (*at(lastLgsTmp,i)).valueToString();
 		
 		if (!oneState.empty() && !contains_list(states,oneState)) {
 			states.push_back(oneState);
 		}
 
-		if (!newLabel.empty() && !lastLgsTmp[i].valueToString().empty())
-			newLabel += ',' + lastLgsTmp[i].valueToString();
+		if (!newLabel.empty() && !(*at(lastLgsTmp,i)).valueToString().empty())
+			newLabel += ',' + (*at(lastLgsTmp,i)).valueToString();
 
 		pair<string, string> r{ oldLabel, newLabel };
 		if (contains_list(relations,r)) {
-			tmp[i] =find(pcs,i);//改了
-			lastLgsTmp[i] = lastLg;
+			(*at(tmp,i)) = *at(pcs,i);//改了
+			(*at(lastLgsTmp,i)) = lastLg;
 			continue;
 		}
 
@@ -1147,8 +1149,8 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			labels.push_back(newLabel);
 		}
 		createKsLables(lgss, tmp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
-		tmp[i] = find(pcs,i);
-		lastLgsTmp[i] = lastLg;
+		(*at(tmp,i)) = *at(pcs,i);
+		(*at(lastLgsTmp,i)) = lastLg;
 	}
 }
 
@@ -1190,7 +1192,7 @@ void ImpKs::onStart()
 		list<string> list;
 		statementToList(v, list);
 		//添加一个结束标签
-		string prefix = find(list,0).left(1);
+		string prefix = (*at(list,0)).left(1);
 		list .push_back( prefix + "E:");
 		//ui.outputEdit->append(list.join('\n'));
 		ui.outputEdit->append(jointList(list, "\n"));
@@ -1203,7 +1205,7 @@ void ImpKs::onStart()
 	ui.outputEdit->append("First order logical formula:");
 	bool hasPc = statements.size() > 1;
 	for (int i = 0; i < statements.size(); ++i) {
-		list<FirstOrderLogical> formulas = toFormula(statements.at(i));
+		list<FirstOrderLogical> formulas = toFormula(  *at(statements,i) );
 		lgss.push_back( formulas);
 		for (const auto& v : formulas) {
 			if (hasPc) {
