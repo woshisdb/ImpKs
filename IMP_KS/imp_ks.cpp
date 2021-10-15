@@ -79,7 +79,22 @@ string find(list<string> u, int no)
 	}
 	return *it;
 }
-
+list<FirstOrderLogical> find(list<list<FirstOrderLogical>> u, int no)
+{
+	list<list<FirstOrderLogical>>::iterator it = u.begin();
+	for (int i = 0; i < no; i++, it++)
+	{
+	}
+	return *it;
+}
+FirstOrderLogical find(list<FirstOrderLogical> u, int no)
+{
+	list<FirstOrderLogical>::iterator it = u.begin();
+	for (int i = 0; i < no; i++, it++)
+	{
+	}
+	return *it;
+}
 int lastIndexOf(string u,char v)
 {
 	for (int i = u.length - 1; i >= 0; i--)
@@ -702,31 +717,31 @@ list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out =
 
 		if (sm.type == StatementType::If) {
 			if (!sm.ifBody.empty()) {
-				list << toFormula(sm, sm.ifBody.first());
-				list << toFormula(sm.ifBody, postSm);
+				list.push_back( toFormula(sm, *(sm.ifBody.begin()) ) ); //?
+				list .merge( toFormula(sm.ifBody, postSm) );
 			}
 			if (!sm.elseBody.empty()) {
 				sm.reversedCondition();
-				list << toFormula(sm, sm.elseBody.first());
-				list << toFormula(sm.elseBody, postSm);
+				list.push_back( toFormula(sm, *(sm.elseBody.begin() ) ));
+				list.merge ( toFormula(sm.elseBody, postSm));
 			}
 		}
 		else if (sm.type == StatementType::While) {
 			if (!sm.whileBody.empty()) {
-				list << toFormula(sm, sm.whileBody.first());
-				list << toFormula(sm.whileBody, sm);
+				list.push_back( toFormula(sm, *(sm.whileBody.begin() ) ));
+				list.merge( toFormula(sm.whileBody, sm));
 			}
 			sm.reversedCondition();
-			list << toFormula(sm, postSm);
+			list.push_back( toFormula(sm, postSm));
 		}
 		else if (sm.type == StatementType::Wait) {
 			sm.reversedCondition();
-			list << toFormula(sm, sm);
+			list .push_back( toFormula(sm, sm) );
 			sm.reversedCondition();
-			list << toFormula(sm, postSm);
+			list .push_back( toFormula(sm, postSm));
 		}
 		else {
-			list << toFormula(sm, postSm);
+			list.push_back( toFormula(sm, postSm));
 		}
 	}
 	return list;
@@ -1056,7 +1071,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			int a = 10;
 		}
 
-		lastLgsTmp[i] = nextStep(lgss[i], lastLgsTmp[i]);
+		lastLgsTmp[i] = nextStep(find(lgss,i), find(lastLgsTmp,i));
 		
 		tmp[i] = lastLgsTmp[i].postLable;
 		Variables newVars = lastLgsTmp[i].vars;
