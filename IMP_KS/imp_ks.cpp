@@ -137,28 +137,35 @@ static std::string formatString(const std::string &format, Args ... args)
 }
 string trimmed(string origin)
 {
+	//printf("%d",origin.length());
+	int len = 0;
 	for (int i = 0; i < origin.length(); i++)
 	{
+		//cout<<origin[i]<<endl;
 		if (origin[i] == '\t' || origin[i] == '\n' || origin[i] == '\v' || origin[i] == '\f' || origin[i] == '\r' || origin[i] == ' ')
 		{
-			origin.erase(i);
+			len++;
 		}
 		else
 		{
 			break;
 		}
 	}
-	for (int i = origin.length()-1; i>=0; i--)
+	origin.erase(0, len);
+	len = 0;
+	for (int i = origin.length() - 1; i >= 0; i--)
 	{
+		//cout<<origin[i]<<endl;
 		if (origin[i] == '\t' || origin[i] == '\n' || origin[i] == '\v' || origin[i] == '\f' || origin[i] == '\r' || origin[i] == ' ')
 		{
-			origin.erase(i);
+			len++;
 		}
 		else
 		{
 			break;
 		}
 	}
+	origin.erase(origin.length() - len, len);
 	return origin;
 }
 
