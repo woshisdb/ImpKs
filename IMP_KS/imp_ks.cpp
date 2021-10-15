@@ -64,6 +64,33 @@ string jointList(list<string> l, string aim)
 	}
 	return ret;
 }
+Statement find(list<Statement> u, int no)
+{
+	list<Statement>::iterator it = u.begin();
+	for (int i = 0; i < no; i++, it++)
+	{}
+	return *it;
+}
+string find(list<string> u, int no)
+{
+	list<string>::iterator it = u.begin();
+	for (int i = 0; i < no; i++, it++)
+	{
+	}
+	return *it;
+}
+
+int lastIndexOf(string u,char v)
+{
+	for (int i = u.length - 1; i >= 0; i--)
+	{
+		if (u[i] == v)
+		{
+			return i;
+		}
+	}
+	return -1;//不能找到
+}
 
 list<string> split(string str,string delim)
 {
@@ -540,7 +567,8 @@ list<string> parseCoProcesses( const string &text ) {
 		match = re.match(text);
 		if (match.hasMatch()) {
 			string split = match.captured(1);
-			split = split.left(split.lastIndexOf(';') + 1);//
+			//split = split.left(split.lastIndexOf(';') + 1);//
+			split = split.substr(0,lastIndexOf(split,';') + 1);//
 
 			split = split.trimmed();
 			//processes << split;
@@ -656,16 +684,20 @@ list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out =
 	if (statements.empty())
 		return list<FirstOrderLogical>();
 	if (out.label.empty()) {
-		string prefix = statements.at(0).label.left(1);
+		//string prefix = statements.at(0).label.left(1);
+		string prefix = find(statements,0).label.substr(0, 1);
+		//split = split.substr(0, lastIndexOf(split, ';') + 1);//
 		out.label = prefix + "E";
 	}
 
 	list<FirstOrderLogical> list;
 	for (int i = 0; i < statements.size(); ++i) {
 		Statement postSm = out;
-		Statement sm = statements[i];
+		//Statement sm=statements[i];
+		Statement sm = find(statements, i);
 		if (i + 1 < statements.size()) {
-			postSm = statements.at(i + 1);
+			//postSm = statements.at(i + 1);
+			postSm = find(statements,i + 1);
 		}
 
 		if (sm.type == StatementType::If) {
@@ -759,8 +791,9 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 			}
 			QRect rect(n1 * (w+hSpan), yPos, size.width(), size.height());
 			painter.drawEllipse(rect);
-			painter.drawText(rect, Qt::AlignCenter, _labels.at(n).empty() ? "Begin": _labels.at(n));
-			_labelsGem[_labels.at(n)] = rect;
+			//painter.drawText(rect, Qt::AlignCenter, _labels.at(n).empty() ? "Begin": _labels.at(n));
+			painter.drawText(rect, Qt::AlignCenter, find(_labels,n).empty() ? "Begin" : find(_labels,n));
+			_labelsGem[find(_labels,n)] = rect;
 			++n;
 		}
 	}
@@ -912,7 +945,7 @@ void labledStatements(list<Statements> &smss) {
 	}
 }
 //void statementToList(const Statements &sms, QStringList &list, QString &space=QString())
-void statementToList(const Statements &sms, list<string> &lis, string &space) {
+void statementToList(const Statements &sms, list<string> &lis, string &space) {//?
 	if (sms.empty())
 		return;
 
@@ -1048,13 +1081,14 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 
 		pair<string, string> r{ oldLabel, newLabel };
 		if (contains_list(relations,r)) {
-			tmp[i] = pcs.at(i);
+			tmp[i] =find(pcs,i);//改了
 			lastLgsTmp[i] = lastLg;
 			continue;
 		}
 
 		if (!oldLabel.empty() && !newLabel.empty()) {
-			relations << pair<string, string>{ oldLabel, newLabel };
+			//relations << pair<string, string>{ oldLabel, newLabel };
+			relations.push_back( pair<string, string>{ oldLabel, newLabel } );
 		}	
 		if (! contains_list(labels,oldLabel) && !oldLabel.empty()) {
 			labels.push_back(oldLabel);
@@ -1064,7 +1098,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			labels.push_back(newLabel);
 		}
 		createKsLables(lgss, tmp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
-		tmp[i] = pcs.at(i);
+		tmp[i] = find(pcs,i);
 		lastLgsTmp[i] = lastLg;
 	}
 }
@@ -1095,7 +1129,7 @@ void ImpKs::onStart()
 	for (const auto& v : processes) {
 		Statements tmp;
 		parseStatements(v, tmp);
-		statements << tmp;
+		statements.push_back(tmp);
 	}
 
 	//给所有语句打上标签
@@ -1107,8 +1141,8 @@ void ImpKs::onStart()
 		list<string> list;
 		statementToList(v, list);
 		//添加一个结束标签
-		string prefix = list.at(0).left(1);
-		list << prefix + "E:";
+		string prefix = find(list,0).left(1);
+		list .push_back( prefix + "E:");
 		//ui.outputEdit->append(list.join('\n'));
 		ui.outputEdit->append(jointList(list, "\n"));
 		
