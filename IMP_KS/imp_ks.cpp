@@ -65,6 +65,25 @@ string jointList(list<string> l, string aim)
 	return ret;
 }
 
+list<string> split(string str,string delim)
+{
+	list<string> res;
+	if ("" == str) return res;
+	//先将要切割的字符串从string类型转换为char*类型  
+	char * strs = new char[str.length() + 1]; //不要忘了  
+	strcpy(strs, str.c_str());
+
+	char * d = new char[delim.length() + 1];
+	strcpy(d, delim.c_str());
+
+	char *p = strtok(strs, d);
+	while (p) {
+		string s = p; //分割得到的字符串转换为string类型  
+		res.push_back(s); //存入结果数组  
+		p = strtok(NULL, d);
+	}
+	return res;
+}
 
 template<typename ... Args>
 static std::string formatString(const std::string &format, Args ... args)
@@ -408,8 +427,11 @@ public:
 	}
 
 	int getVarValue(const char var) const {
-		if (var.isNumber()) {
-			return formatString("%c", var).toInt();
+		//if (var.isNumber()) 
+		if (var>='0'&&var<='9')
+		{
+			//return formatString("%c", var).toInt();
+			return var - '0';
 		}
 
 		for (const auto& v : vars) {
@@ -450,7 +472,8 @@ struct KsR
 				}
 			}
 			if (!conatins)
-				unknowndVars.push_back(v.name);
+				//unknowndVars.push_back(v.name);
+				unknowndVars.push_back(v.name+"");//?不知道行吗
 		}
 
 		string tmp;
@@ -500,12 +523,15 @@ list<string> parseCoProcesses( const string &text ) {
 		string processTmp = match.captured(1);
 		//processTmp.remove(' ');
 		processTmp = remove(processTmp, " ");
-		processTags = processTmp.split("||");
+		//processTags = processTmp.split("||");
+		processTags = split(processTmp, "||");
 	}
 
 	//如果没有并行程序，则整个输入就是一个单线程执行的程序
 	if (processTags.empty()) {
-		return processes << text;
+		//return processes << text;  //?
+		processes.push_back(text);//?
+		return processes;//?
 	}
 
 	//如果有并行程序，则解析出各个并行程序段
@@ -514,9 +540,12 @@ list<string> parseCoProcesses( const string &text ) {
 		match = re.match(text);
 		if (match.hasMatch()) {
 			string split = match.captured(1);
-			split = split.left(split.lastIndexOf(';') + 1);
+			split = split.left(split.lastIndexOf(';') + 1);//
+
 			split = split.trimmed();
-			processes << split;
+			//processes << split;
+			processes.push_back(split);
+			return processes;
 		}
 	}
 
@@ -541,7 +570,8 @@ Statement parseWait(const string& input) {
 Statements parseSequence( const string &input ) {
 	Statements sms;
 	string inputTrimmed = input.trimmed();
-	list<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
+	//list<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
+	list<string> list = split(inputTrimmed, ";");
 	for (auto& v : list) {
 		Statement sm;
 		v = v.trimmed();
@@ -881,8 +911,8 @@ void labledStatements(list<Statements> &smss) {
 		prefix = char(prefix.unicode() + 1);
 	}
 }
-
-void statementToList(const Statements &sms, list<string> &list, string &space=string()) {
+//void statementToList(const Statements &sms, QStringList &list, QString &space=QString())
+void statementToList(const Statements &sms, list<string> &lis, string &space) {
 	if (sms.empty())
 		return;
 
@@ -890,22 +920,29 @@ void statementToList(const Statements &sms, list<string> &list, string &space=st
 	list<string> ls;
 	for (const auto& v : sms) {
 		if (v.type == StatementType::Squence) {
-			list << v.label + ": " + space + v.seqBody + ';';
+			lis.push_back(v.label + ": " + space + v.seqBody + ';');
+			//lis << v.label + ": " + space + v.seqBody + ';';
 		}
 		else if (v.type == StatementType::Wait) {
-			list << v.label + ": " + space + "wait (" + v.condition + ");";
+			lis.push_back(v.label + ": " + space + "wait (" + v.condition + ");");
+			//lis << v.label + ": " + space + "wait (" + v.condition + ");";
 		}
 		else if (v.type == StatementType::If) {
-			list << v.label + ": " + space  + "if " + v.condition + " then";
-			statementToList(v.ifBody, list, SpaceNew);
-			list <<  space + "   else";
-			statementToList(v.elseBody, list, SpaceNew);
-			list << space + "   endif";
+			lis.push_back(v.label + ": " + space + "if " + v.condition + " then");
+			//lis << v.label + ": " + space  + "if " + v.condition + " then";
+			statementToList(v.ifBody, lis, SpaceNew);
+			lis.push_back(space + "   else");
+			//lis <<  space + "   else";
+			statementToList(v.elseBody, lis, SpaceNew);
+			lis.push_back(space + "   endif");
+			//lis << space + "   endif";
 		}
 		else if (v.type == StatementType::While) {
-			list << v.label +": " + space + "while " + v.condition + " do";
-			statementToList(v.whileBody, list, SpaceNew);
-			list << space + "   endwhile;";
+			lis.push_back(v.label + ": " + space + "while " + v.condition + " do");
+			//lis << v.label +": " + space + "while " + v.condition + " do";
+			statementToList(v.whileBody, lis, SpaceNew);
+			lis.push_back(space + "   endwhile;");
+			//lis << space + "   endwhile;";
 		}
 	}
 }
