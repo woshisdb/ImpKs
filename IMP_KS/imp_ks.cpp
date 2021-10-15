@@ -135,6 +135,32 @@ static std::string formatString(const std::string &format, Args ... args)
 	std::snprintf(buf.get(), size, format.c_str(), args ...);
 	return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
 }
+string trimmed(string origin)
+{
+	for (int i = 0; i < origin.length(); i++)
+	{
+		if (origin[i] == '\t' || origin[i] == '\n' || origin[i] == '\v' || origin[i] == '\f' || origin[i] == '\r' || origin[i] == ' ')
+		{
+			origin.erase(i);
+		}
+		else
+		{
+			break;
+		}
+	}
+	for (int i = origin.length()-1; i>=0; i--)
+	{
+		if (origin[i] == '\t' || origin[i] == '\n' || origin[i] == '\v' || origin[i] == '\f' || origin[i] == '\r' || origin[i] == ' ')
+		{
+			origin.erase(i);
+		}
+		else
+		{
+			break;
+		}
+	}
+	return origin;
+}
 
 /*
 * 支持的语法：
@@ -434,7 +460,7 @@ public:
 			hasNot = true;
 			//conditionNew.remove("not");
 			conditionNew = remove(conditionNew, "not");
-			conditionNew = conditionNew.trimmed();
+			conditionNew = trimmed(conditionNew);
 		}
 		QRegularExpression re("(\\w)\\s*([><=andotr]+)\\s*(\\w)");
 		QRegularExpressionMatch match = re.match(conditionNew);
@@ -585,7 +611,7 @@ list<string> parseCoProcesses( const string &text ) {
 			//split = split.left(split.lastIndexOf(';') + 1);//
 			split = split.substr(0,lastIndexOf(split,';') + 1);//
 
-			split = split.trimmed();
+			split = trimmed(split);
 			//processes << split;
 			processes.push_back(split);
 			return processes;
@@ -601,7 +627,7 @@ Statement parseWait(const string& input) {
 	string condition;
 	QRegularExpression re("wait\\((.+)\\)");
 	QRegularExpressionMatch match = re.match(input);
-	condition = match.captured(1).trimmed();
+	condition = trimmed(match.captured(1));
 
 	sm.type = StatementType::Wait;
 	sm.condition = condition;
@@ -612,12 +638,12 @@ Statement parseWait(const string& input) {
 //解析顺序语句
 Statements parseSequence( const string &input ) {
 	Statements sms;
-	string inputTrimmed = input.trimmed();
+	string inputTrimmed = trimmed(input);
 	//list<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
 	list<string> list = split(inputTrimmed, ";");
 	for (auto& v : list) {
 		Statement sm;
-		v = v.trimmed();
+		v = trimmed(v);
 		//顺序语句里面可能会包含wait语句
 		if (v.find("wait") != -1) {
 			sm = parseWait(input);
@@ -645,9 +671,9 @@ Statement parseIf(const string& input) {
 		QRegularExpression re("if(.+)then(.+)else(.+)endif;", QRegularExpression::MultilineOption);
 		QRegularExpressionMatch match = re.match(inputNew);
 		Q_ASSERT(match.hasMatch());
-		condition = match.captured(1).trimmed();
-		ifBody = match.captured(2).trimmed();
-		elseBody = match.captured(3).trimmed();
+		condition = trimmed(match.captured(1));
+		ifBody = trimmed(match.captured(2));
+		elseBody = trimmed(match.captured(3));
 	}
 	else {
 		QRegularExpression re("if(.+)then(.+)endif");
@@ -1015,7 +1041,7 @@ FirstOrderLogical nextStep(list <FirstOrderLogical> &lgs, FirstOrderLogical &cur
 
 	FirstOrderLogical lg;
 	if (cur.isNull()) {
-		lg.postLable = lgs.first().preLable;
+		lg.postLable = (*(lgs.begin())).preLable;
 		nextVars(cur.vars, lg);
 		return lg;
 	}
@@ -1083,7 +1109,7 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 		oneRs.postLabel = newLabel;
 		oneRs.postVars = lastLgsTmp[i].vars;
 		oneRs.opr = lastLgsTmp[i].opr;
-		Rs << oneRs;
+		Rs.push_back( oneRs);
 
 		//收集状态S
 		string oneState = lastLgsTmp[i].valueToString();
