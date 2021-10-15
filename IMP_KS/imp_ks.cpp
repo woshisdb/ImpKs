@@ -893,23 +893,23 @@ bool parseStatements(const string& input, Statements& statements) {
 		if (-1 == pos) {
 			e = input.length();
 			string inputSplit = input.mid(s, e - s);
-			statements << parseSequence(inputSplit);
+			statements .merge( parseSequence(inputSplit) );
 			s = e;
 		}
 		else {
 			if (pos > s) {
-				statements << parseSequence(input.mid(s, pos - s));
+				statements. merge( parseSequence(input.mid(s, pos - s)) );
 			}
 			s = pos;
 			if (input.at(pos) == 'i') {
 				e = input.indexOf("endif");
 				e += 6;
-				statements << parseIf(input.mid(s, e - s));
+				statements .push_back( parseIf(input.mid(s, e - s)) );
 			}
 			else {
 				e = input.indexOf("endwhile");
 				e += 9;
-				statements << parseWhile(input.mid(s, e - s));
+				statements .push_back( parseWhile(input.mid(s, e - s)) );
 			}
 			s = e;
 		}
@@ -927,7 +927,8 @@ void changeValue(Variables &vars, char var, int value) {
 		}
 	}
 	if (!find)
-		vars << Variable{ Variable::Int, var, value };
+		//vars << Variable{ Variable::Int, var, value };
+		vars .push_back( Variable{ Variable::Int, var, value } );
 }
 
 
@@ -1170,12 +1171,12 @@ void ImpKs::onStart()
 	bool hasPc = statements.size() > 1;
 	for (int i = 0; i < statements.size(); ++i) {
 		list<FirstOrderLogical> formulas = toFormula(statements.at(i));
-		lgss << formulas;
+		lgss.push_back( formulas);
 		for (const auto& v : formulas) {
 			if (hasPc) {
 				string pc = formatString("pc%d", i);
 				string formulaNew = v.toString();
-				formulaNew.replace("pc", pc);
+				formulaNew.replace(formulaNew.find( "pc"),2, pc);
 				ui.outputEdit->append(formatString("pc=%s and %s", pc, formulaNew));
 			}
 			else
@@ -1192,11 +1193,11 @@ void ImpKs::onStart()
 	Variables vars;
 	for (const auto& v : lgss) {
 		if (lgss.size() > 1) {
-			pcs << "U";
+			pcs .push_back( "U");
 		} else {
-			pcs << "";
+			pcs .push_back( "");
 		}
-		lastLgs << FirstOrderLogical();
+		lastLgs .push_back( FirstOrderLogical() );
 	}
 	createKsLables(lgss, pcs, relations, lables, lastLgs, vars, states, Rs);
 
