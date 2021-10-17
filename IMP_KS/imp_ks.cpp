@@ -924,27 +924,32 @@ bool parseStatements(const string& input, Statements& statements) {
 	int e = 0;
 	while (s < input.length())
 	{
-		int pos = input.indexOf(QRegularExpression("(if|while)"), s);
+		//int pos = input.indexOf(QRegularExpression("(if|while)"), s);
+		int pos = input.find(QRegularExpression("(if|while)"), s);
 		if (-1 == pos) {
 			e = input.length();
-			string inputSplit = input.mid(s, e - s);
+			//string inputSplit = input.mid(s, e - s);
+			string inputSplit = input.substr(s, e - s);
 			statements .merge( parseSequence(inputSplit) );
 			s = e;
 		}
 		else {
 			if (pos > s) {
-				statements. merge( parseSequence(input.mid(s, pos - s)) );
+				//statements. merge( parseSequence(input.mid(s, pos - s)) );
+				statements.merge(parseSequence(input.substr(s, pos - s)));
 			}
 			s = pos;
 			if (input.at(pos) == 'i') {
-				e = input.indexOf("endif");
+				//e = input.indexOf("endif");
+				e = input.find("endif");
 				e += 6;
-				statements .push_back( parseIf(input.mid(s, e - s)) );
+				statements .push_back( parseIf(input.substr(s, e - s)) );
 			}
 			else {
-				e = input.indexOf("endwhile");
+				//e = input.indexOf("endwhile");
+				e = input.find("endwhile");
 				e += 9;
-				statements .push_back( parseWhile(input.mid(s, e - s)) );
+				statements .push_back( parseWhile(input.substr(s, e - s)) );
 			}
 			s = e;
 		}
@@ -1041,9 +1046,10 @@ void ImpKs::showTip(const string& tip)
 void nextVars(const Variables& src, FirstOrderLogical &dst) {
 	dst.vars.clear();
 	dst.vars = src;
-	pair<char, int> pair = dst.assign();
-	if (!pair.first.isNull())
-		changeValue(dst.vars, pair.first, pair.second);					
+	pair<char,int> pir = dst.assign();
+
+	if (   !(   pir.first==NULL  )   )
+		changeValue(dst.vars, pir.first, pir.second);					
 }
 
 //计算下一步的位置，这里需要考虑条件
