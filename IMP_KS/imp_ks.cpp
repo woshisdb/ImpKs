@@ -1,6 +1,7 @@
 #include "imp_ks.h"
 
 #include <iostream>
+#include <cassert>
 #include <string>
 #include <map>
 #include <list>
@@ -366,11 +367,11 @@ public:
 	}
 
 	static string findAssignVariable(const string& statement) {
-		QRegularExpression re("(\\w+)\\s*=\\s*");
-		QRegularExpressionMatch match = re.match(statement);
-		if (match.hasMatch()) {
-			string s = match.captured(1);
-			return match.captured(1);
+		std::regex reg("(\\w+)\\s*=\\s*");
+		std::smatch m;
+		if (std::regex_search(statement, m, reg)) {
+			string s = m[1];
+			return s;
 		}
 		else {
 			return string();
@@ -410,13 +411,14 @@ public:
 			return pair<char, int>();
 		}
 
-		QRegularExpression re("(\\w)\\s*=\\s*(\\w)\\s*([\\*+-])\\s*(\\w)");
-		QRegularExpressionMatch match = re.match(opr);
-		if (match.hasMatch()) {
-			char ret = match.captured(1).at(0);
-			char left = match.captured(2).at(0);
-			char midOpr = match.captured(3).at(0);
-			char right = match.captured(4).at(0);
+		std::regex re("(\\w)\\s*=\\s*(\\w)\\s*([\\*+-])\\s*(\\w)");
+		std::smatch m;
+		if (std::regex_search(opr, m, re)) {
+
+			char ret = string(m[1]).at(0);
+			char left = string(m[2]).at(0);
+			char midOpr = string(m[3]).at(0);
+			char right = string(m[4]).at(0);
 
 			int nLeft = getVarValue(left);
 			int nRight = getVarValue(right);
@@ -434,10 +436,10 @@ public:
 			return pair<char, int>(ret, nRet);
 		}
 
-		re.setPattern("(\\w+)\\s*=\\s*(\\d+)");
-		match = re.match(opr);
-		if (match.hasMatch()) {
-			return pair<char, int>{ match.captured(1).at(0), match.captured(2).toInt()};
+		std::regex re2("(\\w+)\\s*=\\s*(\\d+)");
+		std::smatch m2;
+		if (std::regex_search(opr, m2, re2)) {
+			return pair<char, int>{ string(m2[1]).at(0), std::stoi(string(m2[2]))};
 		}
 		return pair<char, int>();
 	}
@@ -471,13 +473,14 @@ public:
 			conditionNew = remove(conditionNew, "not");
 			conditionNew = trimmed(conditionNew);
 		}
-		QRegularExpression re("(\\w)\\s*([><=andotr]+)\\s*(\\w)");
-		QRegularExpressionMatch match = re.match(conditionNew);
-		assert(match.hasMatch());
 
-		char varLeft = match.captured(1).at(0);
-		string midOpr = match.captured(2);
-		char varRight = match.captured(3).at(0);
+		std::regex re("(\\w)\\s*([><=andotr]+)\\s*(\\w)");
+		std::smatch m;
+		assert(std::regex_search(conditionNew, m, re));
+
+		char varLeft = string(m[1]).at(0);
+		string midOpr = string(m[2]);
+		char varRight = string(m[3]).at(0);
 
 		int left = getVarValue(varLeft);
 		int right = getVarValue(varRight);
@@ -594,10 +597,11 @@ struct KsR
 list<string> parseCoProcesses( const string &text ) {
 	list<string> processes;
 	list<string> processTags;  //代码段标签
-	QRegularExpression re("cobegin(.+)coend");
-	QRegularExpressionMatch match = re.match(text);
-	if (match.hasMatch()) {
-		string processTmp = match.captured(1);
+
+	std::regex re("cobegin(.+)coend");
+	std::smatch m;
+	if (std::regex_search(text, m, re)) {
+		string processTmp = string(m[1]);
 		//processTmp.remove(' ');
 		processTmp = remove(processTmp, " ");
 		//processTags = processTmp.split("||");
@@ -613,10 +617,10 @@ list<string> parseCoProcesses( const string &text ) {
 
 	//如果有并行程序，则解析出各个并行程序段
 	for (auto& v : processTags) {
-		re.setPattern(v + "::([^:]+)");
-		match = re.match(text);
-		if (match.hasMatch()) {
-			string split = match.captured(1);
+		std::regex re(v + "::([^:]+)");
+		std::smatch m;
+		if (std::regex_search(text, m, re)) {
+			string split = string(m[1]);
 			//split = split.left(split.lastIndexOf(';') + 1);//
 			split = split.substr(0,lastIndexOf(split,';') + 1);//
 
@@ -634,13 +638,14 @@ list<string> parseCoProcesses( const string &text ) {
 Statement parseWait(const string& input) {
 	Statement sm;
 	string condition;
-	QRegularExpression re("wait\\((.+)\\)");
-	QRegularExpressionMatch match = re.match(input);
-	condition = trimmed(match.captured(1));
-
-	sm.type = StatementType::Wait;
-	sm.condition = condition;
-
+	std::regex re("wait\\((.+)\\)");
+	std::smatch m;
+	if (std::regex_search(input, m, re)) {
+		condition = trimmed(string(m[1]));
+	
+		sm.type = StatementType::Wait;
+		sm.condition = condition;
+	}
 	return sm;
 }
 
@@ -677,18 +682,20 @@ Statement parseIf(const string& input) {
 	string condition, ifBody, elseBody;
 	
 	if (input.find("else") != -1) {
-		QRegularExpression re("if(.+)then(.+)else(.+)endif;", QRegularExpression::MultilineOption);
-		QRegularExpressionMatch match = re.match(inputNew);
-		Q_ASSERT(match.hasMatch());
-		condition = trimmed(match.captured(1));
-		ifBody = trimmed(match.captured(2));
-		elseBody = trimmed(match.captured(3));
+		// QRegularExpression re("if(.+)then(.+)else(.+)endif;", QRegularExpression::MultilineOption);
+		std::regex re("if(.+)then(.+)else(.+)endif;"); // TODO: multiline
+		std::smatch m;
+		assert(std::regex_search(inputNew, m, re));
+		condition = trimmed(string(m[1]));
+		ifBody = trimmed(string(m[2]));
+		elseBody = trimmed(string(m[3]));
 	}
 	else {
-		QRegularExpression re("if(.+)then(.+)endif");
-		QRegularExpressionMatch match = re.match(inputNew);
-		condition = match.captured(1).trimmed();
-		ifBody = match.captured(2).trimmed();
+		std::regex re("if(.+)then(.+)endif"); // TODO: multiline
+		std::smatch m;
+		assert(std::regex_search(inputNew, m, re));
+		condition = trimmed(string(m[1]));
+		ifBody = trimmed(string(m[2]));
 	}
 
 	sm.type = StatementType::If;
@@ -706,14 +713,16 @@ Statement parseWhile(const string& input) {
 	inputNew = remove(inputNew, "\n");
 	Statement sm;
 	string condition, body;
-	QRegularExpression re("while(.+)do(.+)end");
-	QRegularExpressionMatch match = re.match(inputNew);
-	condition = match.captured(1).trimmed();
-	body = match.captured(2).trimmed();
 
-	sm.type = StatementType::While;
-	sm.condition = condition;
-	parseStatements(body, sm.whileBody);
+	std::regex re("while(.+)do(.+)end");
+	std::smatch m;
+	if (std::regex_search(inputNew, m, re)) {
+		condition = trimmed(string(m[1]));
+		body = trimmed(string(m[2]));
+		sm.type = StatementType::While;
+		sm.condition = condition;
+		parseStatements(body, sm.whileBody);
+	}
 
 	return sm;
 }
@@ -927,7 +936,11 @@ bool parseStatements(const string& input, Statements& statements) {
 	while (s < input.length())
 	{
 		//int pos = input.indexOf(QRegularExpression("(if|while)"), s);
-		int pos = input.find(QRegularExpression("(if|while)"), s);
+		//int pos = input.find(QRegularExpression("(if|while)"), s);
+		int pos = input.find("if", s);
+		if (pos == -1) {
+			pos = input.find("while", s);
+		}
 		if (-1 == pos) {
 			e = input.length();
 			//string inputSplit = input.mid(s, e - s);
