@@ -42,10 +42,10 @@ string remove(string u, string v)
 	return u;
 }
 
-string jointList(list<string> l, string aim)
+string jointList(vector<string> l, string aim)
 {
 	string ret = *(l.begin());
-	list<string>::iterator it = l.begin();
+	vector<string>::iterator it = l.begin();
 	for (it++; it != l.end(); it++)
 	{
 		ret += aim;
@@ -64,25 +64,25 @@ findbas find(findbas u, int no)
 }
 */
 /*
-string find(list<string> u, int no)
+string find(vector<string> u, int no)
 {
-	list<string>::iterator it = u.begin();
+	vector<string>::iterator it = u.begin();
 	for (int i = 0; i < no; i++, it++)
 	{
 	}
 	return *it;
 }
-list<FirstOrderLogical> find(list<list<FirstOrderLogical>> u, int no)
+vector<FirstOrderLogical> find(vector<vector<FirstOrderLogical>> u, int no)
 {
-	list<list<FirstOrderLogical>>::iterator it = u.begin();
+	vector<vector<FirstOrderLogical>>::iterator it = u.begin();
 	for (int i = 0; i < no; i++, it++)
 	{
 	}
 	return *it;
 }
-FirstOrderLogical find(list<FirstOrderLogical> u, int no)
+FirstOrderLogical find(vector<FirstOrderLogical> u, int no)
 {
-	list<FirstOrderLogical>::iterator it = u.begin();
+	vector<FirstOrderLogical>::iterator it = u.begin();
 	for (int i = 0; i < no; i++, it++)
 	{
 	}
@@ -112,9 +112,9 @@ int lastIndexOf(string u,char v)
 	return -1;//不能找到
 }
 
-list<string> split(string str,string delim)
+vector<string> split(string str,string delim)
 {
-	list<string> res;
+	vector<string> res;
 	if ("" == str) return res;
 	//先将要切割的字符串从string类型转换为char*类型  
 	char * strs = new char[str.length() + 1]; //不要忘了  
@@ -320,8 +320,8 @@ struct Variable
 };
 
 struct Statement;
-using Statements = list<Statement>;
-using Variables = list<Variable>;
+using Statements = vector<Statement>;
+using Variables = vector<Variable>;
 
 /**
                                                                       
@@ -349,7 +349,7 @@ struct Statement
 	Statements ifBody;
 	Statements elseBody;
 	Statements whileBody;
-	list<Variable>  vars;
+	vector<Variable>  vars;
 };
 
 
@@ -359,7 +359,7 @@ struct Statement
   \a postLable 后置标签
   \a condition 条件
   \a string opr 操作
-  \a list<Variable> vars;
+  \a vector<Variable> vars;
 */
 struct FirstOrderLogical
 {
@@ -527,7 +527,7 @@ public:
 	string postLable;
 	string condition;
 	string opr;
-	list<Variable> vars;
+	vector<Variable> vars;
 };
 
 
@@ -544,7 +544,7 @@ struct KsR
 		if (opr.empty() && preLabel.empty() && postLabel.empty() )
 			return string();
 
-		list<string> unknowndVars;
+		vector<string> unknowndVars;
 		for (const auto &v : postVars) {
 			bool conatins = false;
 			for (const auto& vPre : preVars) {
@@ -596,9 +596,9 @@ struct KsR
 
 //解析出并发的代码段
 //如果之后一个代码段，说明没有并发，退化到单线程执行
-list<string> parseCoProcesses( const string &text ) {
-	list<string> processes;
-	list<string> processTags;  //代码段标签
+vector<string> parseCoProcesses( const string &text ) {
+	vector<string> processes;
+	vector<string> processTags;  //代码段标签
 
 	std::regex re("cobegin(.+)coend");
 	std::smatch m;
@@ -655,8 +655,8 @@ Statement parseWait(const string& input) {
 Statements parseSequence( const string &input ) {
 	Statements sms;
 	string inputTrimmed = trimmed(input);
-	//list<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
-	list<string> list = split(inputTrimmed, ";");
+	//vector<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
+	vector<string> list = split(inputTrimmed, ";");
 	for (auto& v : list) {
 		Statement sm;
 		v = trimmed(v);
@@ -741,41 +741,44 @@ static FirstOrderLogical toFormula(const Statement& pre, const Statement& post) 
 }
 
 //将所有语句转换为逻辑公式
-list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out) {
+vector<FirstOrderLogical> toFormula(const Statements& statements, Statement &out) {
 	if (statements.empty())
-		return list<FirstOrderLogical>();
+		return vector<FirstOrderLogical>();
 	if (out.label.empty()) {
 		//string prefix = statements.at(0).label.left(1);
-		string prefix = (*at(statements,0)).label.substr(0, 1);
+		string prefix = (statements[0]).label.substr(0, 1);
 		//split = split.substr(0, lastIndexOf(split, ';') + 1);//
 		out.label = prefix + "E";
 	}
 
-	list<FirstOrderLogical> list;
+	vector<FirstOrderLogical> list;
 	for (int i = 0; i < statements.size(); ++i) {
 		Statement postSm = out;
 		//Statement sm=statements[i];
-		Statement sm = *at(statements, i);
+		Statement sm = statements[i];
 		if (i + 1 < statements.size()) {
 			//postSm = statements.at(i + 1);
-			postSm = *at(statements,i + 1);
+			postSm = statements[i + 1];
 		}
 
 		if (sm.type == StatementType::If) {
 			if (!sm.ifBody.empty()) {
 				list.push_back( toFormula(sm, *(sm.ifBody.begin()) ) ); //?
-				list .merge( toFormula(sm.ifBody, postSm) );
+				auto list_tmp = toFormula(sm.ifBody, postSm);
+				list.insert(list.end(), list_tmp.begin(), list_tmp.end());
 			}
 			if (!sm.elseBody.empty()) {
 				sm.reversedCondition();
 				list.push_back( toFormula(sm, *(sm.elseBody.begin() ) ));
-				list.merge ( toFormula(sm.elseBody, postSm));
+				auto list_tmp = toFormula(sm.elseBody, postSm);
+				list.insert(list.end(), list_tmp.begin(), list_tmp.end());
 			}
 		}
 		else if (sm.type == StatementType::While) {
 			if (!sm.whileBody.empty()) {
 				list.push_back( toFormula(sm, *(sm.whileBody.begin() ) ));
-				list.merge( toFormula(sm.whileBody, sm));
+				auto list_tmp = toFormula(sm.whileBody, sm);
+				list.insert(list.end(), list_tmp.begin(), list_tmp.end());
 			}
 			sm.reversedCondition();
 			list.push_back( toFormula(sm, postSm));
@@ -797,8 +800,8 @@ list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out) 
 //用于绘图的窗口
 class KsGraphicDrawer: public QLabel {
 public:
-	KsGraphicDrawer( const list<string> &lables, 
-		const list<pair<string, string>> & relations ) 
+	KsGraphicDrawer( const vector<string> &lables, 
+		const vector<pair<string, string>> & relations ) 
 		: _labels(lables)
 		, _relations(relations)
 	{
@@ -808,8 +811,8 @@ protected:
 	void paintEvent(QPaintEvent*);
 
 private:
-	list<pair<string, string>> _relations;
-	list<string> _labels;
+	vector<pair<string, string>> _relations;
+	vector<string> _labels;
 	QMap<string, QRectF> _labelsGem;
 };
 
@@ -947,13 +950,15 @@ bool parseStatements(const string& input, Statements& statements) {
 			e = input.length();
 			//string inputSplit = input.mid(s, e - s);
 			string inputSplit = input.substr(s, e - s);
-			statements .merge( parseSequence(inputSplit) );
+			auto states_tmp = parseSequence(inputSplit);
+			statements.insert(statements.end(), states_tmp.begin(), states_tmp.end());
 			s = e;
 		}
 		else {
 			if (pos > s) {
 				//statements. merge( parseSequence(input.mid(s, pos - s)) );
-				statements.merge(parseSequence(input.substr(s, pos - s)));
+				auto states_tmp = parseSequence(input.substr(s, pos - s));
+				statements.insert(statements.end(), states_tmp.begin(), states_tmp.end());
 			}
 			s = pos;
 			if (input.at(pos) == 'i') {
@@ -1009,7 +1014,7 @@ void labledStatements(const char& prefix, int& index, Statements& sms) {
 }
 
 //给所有语句打上标签
-void labledStatements(list<Statements> &smss) {
+void labledStatements(vector<Statements> &smss) {
 	char prefix = 'A';
 	for (auto& sms : smss) {
 		int index = 0;
@@ -1019,12 +1024,12 @@ void labledStatements(list<Statements> &smss) {
 	}
 }
 //void statementToList(const Statements &sms, QStringList &list, QString &space=QString())
-void statementToList(const Statements &sms, list<string> &lis, string &space) {//?
+void statementToList(const Statements &sms, vector<string> &lis, string &space) {//?
 	if (sms.empty())
 		return;
 
 	string SpaceNew = space + "    ";
-	list<string> ls;
+	vector<string> ls;
 	for (const auto& v : sms) {
 		if (v.type == StatementType::Squence) {
 			lis.push_back(v.label + ": " + space + v.seqBody + ';');
@@ -1071,7 +1076,7 @@ void nextVars(const Variables& src, FirstOrderLogical &dst) {
 }
 
 //计算下一步的位置，这里需要考虑条件
-FirstOrderLogical nextStep(list <FirstOrderLogical> &lgs, FirstOrderLogical &cur) {
+FirstOrderLogical nextStep(vector<FirstOrderLogical> &lgs, FirstOrderLogical &cur) {
 
 	FirstOrderLogical lg;
 	if (cur.isNull()) {
@@ -1092,20 +1097,20 @@ FirstOrderLogical nextStep(list <FirstOrderLogical> &lgs, FirstOrderLogical &cur
 
 
 
-void createKsLables(list<list<FirstOrderLogical>>& lgss,
+void createKsLables(vector<vector<FirstOrderLogical>>& lgss,
 	//定义PC，指向当前执行的程序段
-	const list<string>& pcs,
-	list<pair<string, string>>& relations,
-	list<string>& labels,
-	list<FirstOrderLogical>& lastLgs,
+	const vector<string>& pcs,
+	vector<pair<string, string>>& relations,
+	vector<string>& labels,
+	vector<FirstOrderLogical>& lastLgs,
 	//当前变量值
 	const Variables& vars,
-	list<string> &states,
-	list<KsR> &Rs, int deep = 0) {
+	vector<string> &states,
+	vector<KsR> &Rs, int deep = 0) {
 
 	++deep;
-	list<string> tmp = pcs;
-	list<FirstOrderLogical> lastLgsTmp = lastLgs;
+	vector<string> tmp = pcs;
+	vector<FirstOrderLogical> lastLgsTmp = lastLgs;
 	for (int i = 0; i < pcs.size(); ++i) {
 		//用户执行完之后恢复
 		KsR oneRs;
@@ -1121,10 +1126,10 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			oldLabel.clear();
 
 		//执行完要恢复到上一步的状态
-		(*at(lastLgsTmp,i)).vars = vars;
-		FirstOrderLogical lastLg = *at(lastLgsTmp,i);
-		string lastArgsStr = (*at(lastLgsTmp,i)).valueToString();
-		oneRs.preVars = (*at(lastLgsTmp,i)).vars;
+		lastLgsTmp[i].vars = vars;
+		FirstOrderLogical lastLg = lastLgsTmp[i];
+		string lastArgsStr = lastLgsTmp[i].valueToString();
+		oneRs.preVars = lastLgsTmp[i].vars;
 		if (!oldLabel.empty() && !lastArgsStr.empty() )
 			oldLabel += ',' + lastArgsStr;
 
@@ -1132,33 +1137,33 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			int a = 10;
 		}
 
-		*at(lastLgsTmp,i) = nextStep(*at(lgss,i),*at(lastLgsTmp,i));
+		lastLgsTmp[i] = nextStep(lgss[i], lastLgsTmp[i]);
 		
-		*at(tmp,i)= (*at(lastLgsTmp,i)).postLable;
-		Variables newVars = (*at(lastLgsTmp,i)).vars;
+		tmp[i]= lastLgsTmp[i].postLable;
+		Variables newVars = lastLgsTmp[i].vars;
 		//string newLabel = tmp.join(' ');
 		string newLabel = jointList(tmp, " ");
 
 		//收集R变换
 		oneRs.postLabel = newLabel;
-		oneRs.postVars = (*at(lastLgsTmp,i)).vars;
-		oneRs.opr = (*at(lastLgsTmp,i)).opr;
+		oneRs.postVars = lastLgsTmp[i].vars;
+		oneRs.opr = lastLgsTmp[i].opr;
 		Rs.push_back( oneRs);
 
 		//收集状态S
-		string oneState = (*at(lastLgsTmp,i)).valueToString();
+		string oneState = lastLgsTmp[i].valueToString();
 		
 		if (!oneState.empty() && !contains_list(states,oneState)) {
 			states.push_back(oneState);
 		}
 
-		if (!newLabel.empty() && !(*at(lastLgsTmp,i)).valueToString().empty())
-			newLabel += ',' + (*at(lastLgsTmp,i)).valueToString();
+		if (!newLabel.empty() && !lastLgsTmp[i].valueToString().empty())
+			newLabel += ',' + lastLgsTmp[i].valueToString();
 
 		pair<string, string> r{ oldLabel, newLabel };
 		if (contains_list(relations,r)) {
-			(*at(tmp,i)) = *at(pcs,i);//改了
-			(*at(lastLgsTmp,i)) = lastLg;
+			tmp[i] = pcs[i];//改了
+			lastLgsTmp[i] = lastLg;
 			continue;
 		}
 
@@ -1174,8 +1179,8 @@ void createKsLables(list<list<FirstOrderLogical>>& lgss,
 			labels.push_back(newLabel);
 		}
 		createKsLables(lgss, tmp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
-		(*at(tmp,i)) = *at(pcs,i);
-		(*at(lastLgsTmp,i)) = lastLg;
+		tmp[i] = pcs[i];
+		lastLgsTmp[i] = lastLg;
 	}
 }
 
@@ -1203,9 +1208,9 @@ void ImpKs::onStart()
 	}
 
 	//解析出所有程序段
-	list<string> processes = parseCoProcesses(input);
+	vector<string> processes = parseCoProcesses(input);
 
-	list<Statements> statements;
+	vector<Statements> statements;
 	for (const auto& v : processes) {
 		Statements tmp;
 		parseStatements(v, tmp);
@@ -1220,11 +1225,11 @@ void ImpKs::onStart()
 	label_code.append("Labeled function:\n");
 	//ui.outputEdit->append("Labeled function:\n");
 	for (const auto& v : statements) {
-		list<string> list;
+		vector<string> list;
 		string space;
 		statementToList(v, list, space);
 		//添加一个结束标签
-		string prefix = (*at(list, 0)).substr(0, 1);
+		string prefix = list[0].substr(0, 1);
 		list.push_back(prefix + "E:");
 		//ui.outputEdit->append(list.join('\n'));
 		label_code.append(jointList(list, "\n"));
@@ -1233,13 +1238,13 @@ void ImpKs::onStart()
 	}
 
 	//输出逻辑公式
-	list<list<FirstOrderLogical>> lgss;
+	vector<vector<FirstOrderLogical>> lgss;
 	string logic_code;//-------------------------------输出逻辑公式-----------------
 	logic_code.append("First order logical formula:");
 	bool hasPc = statements.size() > 1;
 	for (int i = 0; i < statements.size(); ++i) {
 		Statement out;
-		list<FirstOrderLogical> formulas = toFormula(*at(statements, i), out);
+		vector<FirstOrderLogical> formulas = toFormula(statements[i], out);
 		lgss.push_back(formulas);
 		for (const auto& v : formulas) {
 			if (hasPc) {
@@ -1253,12 +1258,12 @@ void ImpKs::onStart()
 		}
 	}
 
-	list<string> pcs;
-	list<pair<string, string>> relations;
-	list<string> lables;
-	list<FirstOrderLogical> lastLgs;
-	list<string> states;
-	list<KsR> Rs;
+	vector<string> pcs;
+	vector<pair<string, string>> relations;
+	vector<string> lables;
+	vector<FirstOrderLogical> lastLgs;
+	vector<string> states;
+	vector<KsR> Rs;
 	Variables vars;
 	for (const auto& v : lgss) {
 		if (lgss.size() > 1) {
