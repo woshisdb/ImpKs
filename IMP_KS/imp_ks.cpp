@@ -782,7 +782,7 @@ list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out =
 	return list;
 }
 
-
+/*
 //用于绘图的窗口
 class KsGraphicDrawer: public QLabel {
 public:
@@ -880,7 +880,7 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 		painter.drawLine(end, { x2, y2 });
 	}
 }
-
+*/
 
 //构造,初始化业务类
 ImpKs::ImpKs()
@@ -1255,7 +1255,7 @@ void ImpKs::onStart()
 	createKsLables(lgss, pcs, relations, lables, lastLgs, vars, states, Rs);
 
 	//输出所有S状态
-	string state_code;
+	string state_code;//------------------------输出状态s
 	state_code.append("\n\nAll States:\n");
 	int index = 0;
 	for (const auto& v : lables) {
@@ -1268,9 +1268,10 @@ void ImpKs::onStart()
 		if (!v.toString().empty())
 			state_code.append(formatString("R%d:= %s", index++, v.toString()));
 	}
-
+	/*
 	//绘制KS图
 	QWidget* widget = new KsGraphicDrawer(lables, relations);
 	ui.scrollArea->setWidget(widget);
 	widget->setGeometry(0, 0, ui.scrollArea->width(), ui.scrollArea->height());
+	*/
 }
