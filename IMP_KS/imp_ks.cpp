@@ -885,6 +885,7 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 //构造,初始化业务类
 ImpKs::ImpKs()
 {
+	/*
     ui.setupUi(this);
 
 	QFont font = ui.inputEdit->font();
@@ -915,6 +916,7 @@ ImpKs::ImpKs()
 
     //默认测试数据
     ui.inputEdit->setText(g_input[2]);
+	*/
 }
 
 
@@ -1169,10 +1171,14 @@ bool checkInputOk(const string& input) {
 //开始执行程序
 void ImpKs::onStart()
 {
+	/*
 	ui.outputEdit->clear();
 	ui.scrollArea->setWidget(Q_NULLPTR);
+	*/
 
-	string input = ui.inputEdit->toPlainText();
+
+	//string input = ui.inputEdit->toPlainText();
+	string input = g_input[0];//输出结果？
 
 	//每次需要清除之前的输出
 	if (!checkInputOk(input)) {
@@ -1194,35 +1200,39 @@ void ImpKs::onStart()
 	labledStatements(statements);
 
 	//输出带标签的代码
-	ui.outputEdit->append("Labeled function:\n");
+	string label_code;//-------------------------------输出标签-----------------
+	label_code.append("Labeled function:\n");
+	//ui.outputEdit->append("Labeled function:\n");
 	for (const auto& v : statements) {
 		list<string> list;
-		statementToList(v, list);
+		string space;
+		statementToList(v, list, space);
 		//添加一个结束标签
-		string prefix = (*at(list,0)).substr(0,1);
-		list .push_back( prefix + "E:");
+		string prefix = (*at(list, 0)).substr(0, 1);
+		list.push_back(prefix + "E:");
 		//ui.outputEdit->append(list.join('\n'));
-		ui.outputEdit->append(jointList(list, "\n"));
-		
-		ui.outputEdit->append("\n\n");
+		label_code.append(jointList(list, "\n"));
+
+		label_code.append("\n\n");
 	}
 
 	//输出逻辑公式
 	list<list<FirstOrderLogical>> lgss;
-	ui.outputEdit->append("First order logical formula:");
+	string logic_code;//-------------------------------输出逻辑公式-----------------
+	logic_code.append("First order logical formula:");
 	bool hasPc = statements.size() > 1;
 	for (int i = 0; i < statements.size(); ++i) {
-		list<FirstOrderLogical> formulas = toFormula(  *at(statements,i) );
-		lgss.push_back( formulas);
+		list<FirstOrderLogical> formulas = toFormula(*at(statements, i));
+		lgss.push_back(formulas);
 		for (const auto& v : formulas) {
 			if (hasPc) {
 				string pc = formatString("pc%d", i);
 				string formulaNew = v.toString();
-				formulaNew.replace(formulaNew.find( "pc"),2, pc);
-				ui.outputEdit->append(formatString("pc=%s and %s", pc, formulaNew));
+				formulaNew.replace(formulaNew.find("pc"), 2, pc);
+				logic_code.append(formatString("pc=%s and %s", pc, formulaNew));
 			}
 			else
-				ui.outputEdit->append(v.toString());
+				logic_code.append(v.toString());
 		}
 	}
 
@@ -1235,28 +1245,30 @@ void ImpKs::onStart()
 	Variables vars;
 	for (const auto& v : lgss) {
 		if (lgss.size() > 1) {
-			pcs .push_back( "U");
-		} else {
-			pcs .push_back( "");
+			pcs.push_back("U");
 		}
-		lastLgs .push_back( FirstOrderLogical() );
+		else {
+			pcs.push_back("");
+		}
+		lastLgs.push_back(FirstOrderLogical());
 	}
 	createKsLables(lgss, pcs, relations, lables, lastLgs, vars, states, Rs);
 
 	//输出所有S状态
-	ui.outputEdit->append("\n\nAll States:\n");
+	string state_code;
+	state_code.append("\n\nAll States:\n");
 	int index = 0;
 	for (const auto& v : lables) {
-		ui.outputEdit->append(formatString("S%d:(%s)", index++, v));
+		state_code.append(formatString("S%d:(%s)", index++, v));
 	}
 
-	ui.outputEdit->append("\n");
+	state_code.append("\n");
 	index = 0;
 	for (const auto& v : Rs) {
-		if( !v.toString().empty() )
-			ui.outputEdit->append(formatString("R%d:= %s", index++, v.toString()));
+		if (!v.toString().empty())
+			state_code.append(formatString("R%d:= %s", index++, v.toString()));
 	}
-	
+
 	//绘制KS图
 	QWidget* widget = new KsGraphicDrawer(lables, relations);
 	ui.scrollArea->setWidget(widget);
