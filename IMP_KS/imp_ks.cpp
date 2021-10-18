@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "imp_ks.h"
 
 #include <iostream>
@@ -100,7 +102,7 @@ typename container::iterator at(container &u, int no)
 
 int lastIndexOf(string u,char v)
 {
-	for (int i = u.length - 1; i >= 0; i--)
+	for (int i = u.length() - 1; i >= 0; i--)
 	{
 		if (u[i] == v)
 		{
@@ -739,7 +741,7 @@ static FirstOrderLogical toFormula(const Statement& pre, const Statement& post) 
 }
 
 //将所有语句转换为逻辑公式
-list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out = Statement()) {
+list<FirstOrderLogical> toFormula(const Statements& statements, Statement &out) {
 	if (statements.empty())
 		return list<FirstOrderLogical>();
 	if (out.label.empty()) {
@@ -1054,7 +1056,8 @@ void statementToList(const Statements &sms, list<string> &lis, string &space) {/
 
 void ImpKs::showTip(const string& tip)
 {
-	QMessageBox::warning(Q_NULLPTR, "", tip);
+	//QMessageBox::warning(Q_NULLPTR, "", tip);
+	cout << "showTip";
 }
 
 
@@ -1235,7 +1238,8 @@ void ImpKs::onStart()
 	logic_code.append("First order logical formula:");
 	bool hasPc = statements.size() > 1;
 	for (int i = 0; i < statements.size(); ++i) {
-		list<FirstOrderLogical> formulas = toFormula(*at(statements, i));
+		Statement out;
+		list<FirstOrderLogical> formulas = toFormula(*at(statements, i), out);
 		lgss.push_back(formulas);
 		for (const auto& v : formulas) {
 			if (hasPc) {
