@@ -138,7 +138,8 @@ static std::string formatString(const std::string &format, Args ... args)
 	auto size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
 	std::unique_ptr<char[]> buf(new char[size]);
 	std::snprintf(buf.get(), size, format.c_str(), args ...);
-	return std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+	string ret = std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+	return ret;
 }
 string trimmed(string origin)
 {
@@ -339,7 +340,7 @@ struct Statement
 			//condition = condition.trimmed();
 		}
 		else {
-			condition = formatString("not %s", condition);
+			condition = formatString("not %s", condition.c_str());
 		}
 	}
 	StatementType type;  //语句类型
@@ -382,16 +383,16 @@ public:
 
 	string toString() const {
 		if (!condition.empty()) {
-			return formatString("pc=%s and pc'=%s and (%s) and SAME(V)", preLable, postLable, condition);
+			return formatString("pc=%s and pc'=%s and (%s) and SAME(V)", preLable.c_str(), postLable.c_str(), condition.c_str());
 		}
 		else {
-			string tmp = formatString("pc=%s and pc'=%s and (%s)", preLable, postLable, opr);
+			string tmp = formatString("pc=%s and pc'=%s and (%s)", preLable.c_str(), postLable.c_str(), opr.c_str());
 			string var = findAssignVariable(opr);
 			if (var.empty()) {
 				tmp += " and SAME(V)";
 			}
 			else {
-				tmp += formatString(" and SAME(V\\{%s})", var);
+				tmp += formatString(" and SAME(V\\{%s})", var.c_str());
 			}
 			return tmp;
 		}
@@ -570,7 +571,7 @@ struct KsR
 		//加进入未定义的变量
 		for (const auto& v : unknowndVars) {
 			tmp += ",";
-			tmp += formatString("%s=u", v);
+			tmp += formatString("%s=u", v.c_str());
 		}
 		
 		tmp += ") -> (pc'=";
@@ -1200,6 +1201,8 @@ void ImpKs::onStart()
 
 	//string input = ui.inputEdit->toPlainText();
 	string input = g_input[0];//输出结果？
+	cout << "\n第零步结果：原始IMP程序" << endl;
+	cout << input << endl;
 
 	//每次需要清除之前的输出
 	if (!checkInputOk(input)) {
@@ -1236,6 +1239,8 @@ void ImpKs::onStart()
 
 		label_code.append("\n\n");
 	}
+	cout << "\n第二步结果：打标签处理后的程序" << endl;
+	cout << label_code << endl;
 
 	//输出逻辑公式
 	vector<vector<FirstOrderLogical>> lgss;
@@ -1251,12 +1256,14 @@ void ImpKs::onStart()
 				string pc = formatString("pc%d", i);
 				string formulaNew = v.toString();
 				formulaNew.replace(formulaNew.find("pc"), 2, pc);
-				logic_code.append(formatString("pc=%s and %s", pc, formulaNew));
+				logic_code.append(formatString("pc=%s and %s", pc.c_str(), formulaNew.c_str()));
 			}
 			else
 				logic_code.append(v.toString());
 		}
 	}
+	cout << "\n第三步结果：逻辑公式" << endl;
+	cout << logic_code << endl;
 
 	vector<string> pcs;
 	vector<pair<string, string>> relations;
@@ -1281,15 +1288,17 @@ void ImpKs::onStart()
 	state_code.append("\n\nAll States:\n");
 	int index = 0;
 	for (const auto& v : lables) {
-		state_code.append(formatString("S%d:(%s)", index++, v));
+		state_code.append(formatString("S%d:(%s)", index++, v.c_str()));
 	}
 
 	state_code.append("\n");
 	index = 0;
 	for (const auto& v : Rs) {
 		if (!v.toString().empty())
-			state_code.append(formatString("R%d:= %s", index++, v.toString()));
+			state_code.append(formatString("R%d:= %s", index++, v.toString().c_str()));
 	}
+	cout << "\n第四步数据：KS状态机描述" << endl;
+	cout << state_code << endl;
 	/*
 	//绘制KS图
 	QWidget* widget = new KsGraphicDrawer(lables, relations);
