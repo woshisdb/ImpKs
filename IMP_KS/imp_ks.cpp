@@ -610,6 +610,7 @@ vector<string> parseCoProcesses( const string &text ) {
 		//processTags = processTmp.split("||");
 		processTags = split(processTmp, "||");
 	}
+	
 
 	//如果没有并行程序，则整个输入就是一个单线程执行的程序
 	if (processTags.empty()) {
@@ -620,6 +621,7 @@ vector<string> parseCoProcesses( const string &text ) {
 
 	//如果有并行程序，则解析出各个并行程序段
 	for (auto& v : processTags) {
+		cout << v;
 		std::regex re(v + "::([^:]+)");
 		std::smatch m;
 		if (std::regex_search(text, m, re)) {
@@ -630,7 +632,7 @@ vector<string> parseCoProcesses( const string &text ) {
 			split = trimmed(split);
 			//processes << split;
 			processes.push_back(split);
-			return processes;
+			//return processes;
 		}
 	}
 
@@ -1199,19 +1201,19 @@ void ImpKs::onStart()
 	*/
 
 
-	//string input = ui.inputEdit->toPlainText();
-	string input = g_input[0];//输出结果？
+	string input = g_input[4];//输出结果？
 	cout << "\n第零步结果：原始IMP程序" << endl;
 	cout << input << endl;
 
-	//每次需要清除之前的输出
-	if (!checkInputOk(input)) {
-		showTip("Code input error, please check your code!");
-		return;
-	}
 
 	//解析出所有程序段
 	vector<string> processes = parseCoProcesses(input);
+	cout << "\n第零步结果：输出解析程序段" << endl;
+	for (int i = 0; i < processes.size(); i++)
+	{
+		cout << processes[i] << endl;
+		cout << "-------------"<<endl;
+	}
 
 	vector<Statements> statements;
 	for (const auto& v : processes) {
@@ -1219,6 +1221,7 @@ void ImpKs::onStart()
 		parseStatements(v, tmp);
 		statements.push_back(tmp);
 	}
+
 
 	//给所有语句打上标签
 	labledStatements(statements);
