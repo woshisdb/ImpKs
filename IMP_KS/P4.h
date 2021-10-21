@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include <cassert>
+#include<regex>
 #include"basic_method.h"
 #include"basicStruct.h"
 using namespace std;
@@ -76,7 +77,7 @@ public:
 			//用户执行完之后恢复
 			KsR oneRs;
 			//string oldLabel = tmp.join(' ');
-			string oldLabel = jointList(tmp, " ");
+			string oldLabel = jointList(tmp, " ");//"""""""""""""""""""""""""""""""""""""
 			oneRs.preLabel = oldLabel;
 
 			//只包含空格，则认为是空
@@ -144,22 +145,22 @@ public:
 			lastLgsTmp[i] = lastLg;
 		}
 	}
-	string out_result(vector<string> lables, vector<KsR> Rs)
+	void out_result(vector<string> lables, vector<KsR> Rs, string &state_code, string &state_rela)
 	{
 		//输出所有S状态
-		string state_code;//------------------------输出状态s
-		state_code.append("All States:\n");
+		//string state_code;//------------------------输出状态s
+		//state_code.append("All States:\n");
 		int index = 0;
 		for (const auto& v : lables) {
-			state_code.append(formatString("S%d:(%s)", index++, v.c_str()));
-		}
+			state_code.append(formatString("S%d:(%s)\n", index++, v.c_str()));
 
-		state_code.append("\n");
+		}
 		index = 0;
 		for (const auto& v : Rs) {
+			
 			if (!v.toString().empty())
-				state_code.append(formatString("R%d:= %s", index++, v.toString().c_str()));
+				state_rela.append(formatString("R%d:= %s\n", index++, v.toString().c_str()));
 		}
-		return state_code;
+
 	}
 };

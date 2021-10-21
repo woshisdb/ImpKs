@@ -17,16 +17,13 @@ public:
 		std::smatch m;
 		if (std::regex_search(text, m, re)) {
 			string processTmp = string(m[1]);
-			//processTmp.remove(' ');
 			processTmp = remove(processTmp, " ");
-			//processTags = processTmp.split("||");
 			processTags = split(processTmp, "||");
 		}
 
 
 		//如果没有并行程序，则整个输入就是一个单线程执行的程序
 		if (processTags.empty()) {
-			//return processes << text;  //?
 			processes.push_back(text);//?
 			return processes;//?
 		}

@@ -14,7 +14,6 @@ class ImpKs
 {
 
 public:
-	ImpKs();
     void onStart();
 
 

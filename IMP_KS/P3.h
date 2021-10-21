@@ -95,6 +95,21 @@ public:
 				}
 				else
 					logic_code.append(v.toString());
+				logic_code.append("\n");
+				
+				logic_code.append("{\n");
+				logic_code.append("prelabel:"+v.preLable+"\n");
+				logic_code.append("postlabel:" + v.postLable + "\n");
+				logic_code.append("condition:" + v.condition + "\n");
+				logic_code.append("opr:" + v.opr + "\n");
+				for (const auto t : v.vars)
+				{
+					logic_code.append(t.type+"-------");
+					logic_code.append(t.name + "=");
+					logic_code.append(t.value+";\n");
+				}
+				logic_code.append("\n}\n");
+				
 			}
 			
 		}

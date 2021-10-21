@@ -283,8 +283,11 @@ struct KsR
 				}
 			}
 			if (!conatins)
+			{
 				//unknowndVars.push_back(v.name);
-				unknowndVars.push_back(v.name + "");//?不知道行吗
+				string temp(1, v.name);
+				unknowndVars.push_back(temp);//?不知道行吗
+			}
 		}
 
 		string tmp;
@@ -313,10 +316,6 @@ struct KsR
 
 		tmp += ")";
 
-		//注释掉变换条件
-		//tmp += "and (";
-		//tmp += opr;
-		//tmp += ")";
 		return tmp;
 	}
 };

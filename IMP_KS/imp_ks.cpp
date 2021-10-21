@@ -19,13 +19,8 @@
 using namespace std;
 
 const string g_input[] = {
-R"(a=0;
-b=2;
-while a<b do
-    a=a+1;
-endwhile;
-a=2;
-b=0;)",
+R"(
+a=1;)",
 
 R"(a=0;
 b=1;
@@ -75,26 +70,6 @@ while true do
 endwhile;)",
 };
 
-
-void output_node(Statement node)
-{
-	cout << "{" << endl;
-	if (StatementType::While == node.type)
-	{
-		cout << "StatementType:" << "While" << endl;
-		output_node(node.whileBody[0]);
-	}
-	else
-	{
-		cout << "StatementType:"<<"else" << endl;
-	}
-	cout << "label:" + node.label << endl;
-	cout << "condition:" + node.condition << endl;
-	cout << "seqBody:" + node.seqBody << endl;
-	cout << "}" << endl;
-
-}
-
 /**
 * \b 一阶逻辑数据结构，可以从一阶逻辑生成KS结构
   \a preLable 前置标签
@@ -103,25 +78,112 @@ void output_node(Statement node)
   \a string opr 操作
   \a vector<Variable> vars;
 */
-//KS 中的R结构
-//构造,初始化业务类
-ImpKs::ImpKs()
+typedef struct val{
+	string u;
+	string v;
+};
+typedef struct json_node{
+	string all;
+	vector<val> vals;
+	string no;//pc值
+};
+typedef struct edge {
+	string u;
+	string v;
+};
+json_node to_node(string node)
 {
+	json_node res;
+	node=remove(node,")");
+	node.erase(0,node.find('(')+1);
+	//cout << node << endl;
 
+	vector<string> temp = split(node,",");
+	res.no = temp[0];
+	for (int i = 1; i < temp.size(); i++)
+	{
+		val tv;
+		vector<string> tt = split(temp[i],"=");
+		tv.u = tt[0];
+		tv.v = tt[1];
+		res.vals.push_back(tv);
+	}
+	return res;
+}
+vector<json_node> analy(string head)
+{
+	vector<json_node> res;
+	string now=head+"";
+	regex reg("\n");
+	sregex_token_iterator pos(now.begin(), now.end(), reg, -1);
+	decltype(pos) end;
+	for (; pos != end; ++pos)
+	{
+		json_node temp=to_node(pos->str());
+		res.push_back(temp);
+	}
+	json_node U;
+	U.no = "U";
+	res.push_back(U);
+	json_node PE;
+	PE.no = "PE";
+	res.push_back(PE);
+	return res;
+}
+edge edg_ju(string ge)
+{
+	edge res; //node.erase(0, node.find('(') + 1);
+	vector<string> temp = split( ge.erase(0, ge.find('=')+1) ," -> ");
+	temp[0] = remove(temp[0], "(");
+	temp[0] = remove(temp[0], ")");
+	temp[1] = remove(temp[1], "(");
+	temp[1] = remove(temp[1], ")");
+	res.u = (split(temp[0], ",")[0]);
+	res.u = res.u.erase(0, res.u.find("=")+1);
+	res.v = (split(temp[1], ",")[0]);
+	res.v = res.v.erase(0, res.v.find("=") + 1);
+	return res;
+}
+vector<edge> judge(string e)
+{
+	vector<edge> res;
+	vector<string> temp;
+	temp = split(e,"\n");
+	for (int i=0;i<temp.size();i++)
+	{
+		res.push_back( edg_ju(temp[i]) );
+	}
+	return res;
 }
 
-//将输入代码解析为语法树
 
-
-
-bool checkInputOk(const string& input) {
-	return true;
+void draw_json(vector<json_node> h, vector<edge> eg)
+{
+	string res="{ \"class\": \"go.GraphLinksModel\",\"nodeKeyProperty\" : \"id\", \"nodeDataArray\": [  \n";
+	for (int i = 0; i < h.size(); i++)
+	{
+		if (i != 0)
+		{
+			res += ",";
+		}
+		res += " {\"id\": " + h[i].no + "," + " \" text \" : \"" + h[i].no + " \"}";
+	}
+	res += "],";
+	res += " \"linkDataArray\": [  ";
+	for (int i = 0; i < eg.size(); i++)
+	{
+		if (i != 0)
+			res += ",";
+		res += "{ \"from\":" + eg[i].u + ", \"to\":"+eg[i].v;
+	}
+	res += "]}";
+	cout << res;
 }
 
 //开始执行程序
 void ImpKs::onStart()
 {
-	string input = g_input[0];//输出结果？
+	string input = g_input[2];//输出结果？
 	cout << "\n第零步结果：原始IMP程序" << endl;
 	cout << input << endl;
 
@@ -138,14 +200,6 @@ void ImpKs::onStart()
 	for (const auto& v : processes) {
 		Statements tmp;//对每个程序p1,p2分别处理
 		program_0.parseStatements(v, tmp);
-		/*
-		cout << "输出statement" << endl;
-		//
-		for (const auto node : tmp)
-		{
-			output_node(node);
-		}
-		*/
 		statements.push_back(tmp);
 	}
 
@@ -175,10 +229,12 @@ void ImpKs::onStart()
 	program3.to_label(lgss,pcs,relations, lables,lastLgs,states, Rs,vars);
 	program3.createKsLables(lgss, pcs, relations, lables, lastLgs, vars, states, Rs);
 
-	string result = program3.out_result(lables,Rs);
 
-	cout << "\n第四步数据：KS状态机描述" << endl;
-	cout << result<< endl;
-
-	
+	string head;
+	string eag;
+	program3.out_result(lables,Rs,head,eag);
+	cout << head << "\n" << eag;
+	vector<json_node> h=analy(head);
+	vector<edge> eg = judge(eag);
+	draw_json(h,eg);
 }

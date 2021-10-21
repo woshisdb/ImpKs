@@ -27,9 +27,9 @@ public:
 
 	//给所有语句打上标签
 	void labledStatements(vector<Statements> &smss) {
-		char prefix = 'A';
+		char prefix = 'P';
 		for (auto& sms : smss) {
-			int index = 0;
+			int index = 0;//输出每个进程的标签
 			labledStatements(prefix, index, sms);
 			//prefix = char(prefix.unicode() + 1);
 			prefix = char(prefix + 1);
