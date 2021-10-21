@@ -1,6 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
-
 #include "imp_ks.h"
+#include"P1.h"
 #include "basic_method.h"
 #include <iostream>
 #include <cassert>
@@ -498,6 +498,8 @@ struct KsR
 
 //解析出并发的代码段
 //如果之后一个代码段，说明没有并发，退化到单线程执行
+
+/*
 vector<string> parseCoProcesses( const string &text ) {
 	vector<string> processes;
 	vector<string> processTags;  //代码段标签
@@ -539,6 +541,7 @@ vector<string> parseCoProcesses( const string &text ) {
 
 	return processes;
 }
+*/
 
 //解析 wait 语句
 Statement parseWait(const string& input) {
@@ -803,38 +806,7 @@ void KsGraphicDrawer::paintEvent(QPaintEvent*)
 //构造,初始化业务类
 ImpKs::ImpKs()
 {
-	/*
-    ui.setupUi(this);
 
-	QFont font = ui.inputEdit->font();
-	font.setPointSize(12);
-	ui.inputEdit->setFont(font);
-	ui.outputEdit->setFont(font);
-
-	//加载测试数据
-	//支持通过菜单选择测试数据
-	connect(ui.actionWhile, &QAction::triggered, this, [this] {
-		ui.inputEdit->setText(g_input[0]);
-		});
-	connect(ui.actionIf, &QAction::triggered, this, [this] {
-		ui.inputEdit->setText(g_input[1]);
-		});
-	connect(ui.actionwhileif, &QAction::triggered, this, [this] {
-		ui.inputEdit->setText(g_input[2]);
-		});
-	connect(ui.actionifWhile, &QAction::triggered, this, [this] {
-		ui.inputEdit->setText(g_input[3]);
-		});
-	connect(ui.actionCobegin, &QAction::triggered, this, [this] {
-		ui.inputEdit->setText(g_input[4]);
-		});
-
-	//开始执行
-	connect(ui.actionBuild, &QAction::triggered, this, &ImpKs::onStart);
-
-    //默认测试数据
-    ui.inputEdit->setText(g_input[2]);
-	*/
 }
 
 
@@ -1087,6 +1059,7 @@ void createKsLables(vector<vector<FirstOrderLogical>>& lgss,
 	}
 }
 
+
 bool checkInputOk(const string& input) {
 	return true;
 }
@@ -1107,7 +1080,8 @@ void ImpKs::onStart()
 
 
 	//解析出所有程序段
-	vector<string> processes = parseCoProcesses(input);
+	P1 program_0;
+	vector<string> processes =program_0.parseCoProcesses(input);
 	cout << "\n第零步结果：输出解析程序段" << endl;
 	for (int i = 0; i < processes.size(); i++)
 	{
