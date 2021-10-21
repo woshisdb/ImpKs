@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "imp_ks.h"
-
+#include "basic_method.h"
 #include <iostream>
 #include <cassert>
 #include <string>
@@ -15,8 +15,19 @@
 
 using namespace std;
 
-template<class nump,class sea>
-bool contains_list(nump l, sea aim)//检查链表中是否有aim
+template<typename ... Args>
+static std::string formatString(const std::string &format, Args ... args)
+{
+	auto size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
+	std::unique_ptr<char[]> buf(new char[size]);
+	std::snprintf(buf.get(), size, format.c_str(), args ...);
+	string ret = std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
+	return ret;
+}
+
+
+template<class nump, class sea>
+bool is_contains_list(nump l, sea aim)//检查链表中是否有aim
 {
 	bool has = false;
 	typename nump::iterator it = l.begin();
@@ -31,149 +42,22 @@ bool contains_list(nump l, sea aim)//检查链表中是否有aim
 	return has;
 }
 
-string remove(string u, string v)
-{
-	int pos = u.find(v);
-	while (pos != -1)
-	{
-		u.erase(pos, v.length());
-		pos = u.find(v);
-	}
-	return u;
-}
 
-string jointList(vector<string> l, string aim)
-{
-	string ret = *(l.begin());
-	vector<string>::iterator it = l.begin();
-	for (it++; it != l.end(); it++)
-	{
-		ret += aim;
-		ret += *(it);
-	}
-	return ret;
-}
-/*
-template<class findbas>
-findbas find(findbas u, int no)
-{
-	typename findbas::iterator it = u.begin();
-	for (int i = 0; i < no; i++, it++)
-	{}
-	return *it;
-}
-*/
-/*
-string find(vector<string> u, int no)
-{
-	vector<string>::iterator it = u.begin();
-	for (int i = 0; i < no; i++, it++)
-	{
-	}
-	return *it;
-}
-vector<FirstOrderLogical> find(vector<vector<FirstOrderLogical>> u, int no)
-{
-	vector<vector<FirstOrderLogical>>::iterator it = u.begin();
-	for (int i = 0; i < no; i++, it++)
-	{
-	}
-	return *it;
-}
-FirstOrderLogical find(vector<FirstOrderLogical> u, int no)
-{
-	vector<FirstOrderLogical>::iterator it = u.begin();
-	for (int i = 0; i < no; i++, it++)
-	{
-	}
-	return *it;
-}
-*/
-template<class container>//一个
-typename container::iterator at(container &u, int no)
-{
-	typename container::iterator it = u.begin();
-	for (int i = 0; i < no; i++, it++)
-	{
 
-	}
-	return it;
-}
 
-int lastIndexOf(string u,char v)
-{
-	for (int i = u.length() - 1; i >= 0; i--)
-	{
-		if (u[i] == v)
-		{
-			return i;
-		}
-	}
-	return -1;//不能找到
-}
 
-vector<string> split(string str,string delim)
-{
-	vector<string> res;
-	if ("" == str) return res;
-	//先将要切割的字符串从string类型转换为char*类型  
-	char * strs = new char[str.length() + 1]; //不要忘了  
-	strcpy(strs, str.c_str());
 
-	char * d = new char[delim.length() + 1];
-	strcpy(d, delim.c_str());
 
-	char *p = strtok(strs, d);
-	while (p) {
-		string s = p; //分割得到的字符串转换为string类型  
-		res.push_back(s); //存入结果数组  
-		p = strtok(NULL, d);
-	}
-	return res;
-}
 
-template<typename ... Args>
-static std::string formatString(const std::string &format, Args ... args)
-{
-	auto size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
-	std::unique_ptr<char[]> buf(new char[size]);
-	std::snprintf(buf.get(), size, format.c_str(), args ...);
-	string ret = std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-	return ret;
-}
-string trimmed(string origin)
-{
-	//printf("%d",origin.length());
-	int len = 0;
-	for (int i = 0; i < origin.length(); i++)
-	{
-		//cout<<origin[i]<<endl;
-		if (origin[i] == '\t' || origin[i] == '\n' || origin[i] == '\v' || origin[i] == '\f' || origin[i] == '\r' || origin[i] == ' ')
-		{
-			len++;
-		}
-		else
-		{
-			break;
-		}
-	}
-	origin.erase(0, len);
-	len = 0;
-	for (int i = origin.length() - 1; i >= 0; i--)
-	{
-		//cout<<origin[i]<<endl;
-		if (origin[i] == '\t' || origin[i] == '\n' || origin[i] == '\v' || origin[i] == '\f' || origin[i] == '\r' || origin[i] == ' ')
-		{
-			len++;
-		}
-		else
-		{
-			break;
-		}
-	}
-	origin.erase(origin.length() - len, len);
-	return origin;
-}
+
+
+
+
+
+
+
+
+
 
 /*
 * 支持的语法：
@@ -352,7 +236,24 @@ struct Statement
 	Statements whileBody;
 	vector<Variable>  vars;
 };
+void output_node(Statement node)
+{
+	cout << "{" << endl;
+	if (StatementType::While == node.type)
+	{
+		cout << "StatementType:" << "While" << endl;
+		output_node(node.whileBody[0]);
+	}
+	else
+	{
+		cout << "StatementType:"<<"else" << endl;
+	}
+	cout << "label:" + node.label << endl;
+	cout << "condition:" + node.condition << endl;
+	cout << "seqBody:" + node.seqBody << endl;
+	cout << "}" << endl;
 
+}
 
 /**
 * \b 一阶逻辑数据结构，可以从一阶逻辑生成KS结构
@@ -951,7 +852,6 @@ bool parseStatements(const string& input, Statements& statements) {
 		}
 		if (-1 == pos) {
 			e = input.length();
-			//string inputSplit = input.mid(s, e - s);
 			string inputSplit = input.substr(s, e - s);
 			auto states_tmp = parseSequence(inputSplit);
 			statements.insert(statements.end(), states_tmp.begin(), states_tmp.end());
@@ -1156,7 +1056,7 @@ void createKsLables(vector<vector<FirstOrderLogical>>& lgss,
 		//收集状态S
 		string oneState = lastLgsTmp[i].valueToString();
 		
-		if (!oneState.empty() && !contains_list(states,oneState)) {
+		if (!oneState.empty() && !is_contains_list(states,oneState)) {
 			states.push_back(oneState);
 		}
 
@@ -1164,7 +1064,7 @@ void createKsLables(vector<vector<FirstOrderLogical>>& lgss,
 			newLabel += ',' + lastLgsTmp[i].valueToString();
 
 		pair<string, string> r{ oldLabel, newLabel };
-		if (contains_list(relations,r)) {
+		if (is_contains_list(relations,r)) {
 			tmp[i] = pcs[i];//改了
 			lastLgsTmp[i] = lastLg;
 			continue;
@@ -1174,11 +1074,11 @@ void createKsLables(vector<vector<FirstOrderLogical>>& lgss,
 			//relations << pair<string, string>{ oldLabel, newLabel };
 			relations.push_back( pair<string, string>{ oldLabel, newLabel } );
 		}	
-		if (! contains_list(labels,oldLabel) && !oldLabel.empty()) {
+		if (! is_contains_list(labels,oldLabel) && !oldLabel.empty()) {
 			labels.push_back(oldLabel);
 		}
 
-		if (!contains_list(labels, newLabel)&& !newLabel.empty()) {
+		if (!is_contains_list(labels, newLabel)&& !newLabel.empty()) {
 			labels.push_back(newLabel);
 		}
 		createKsLables(lgss, tmp, relations, labels, lastLgsTmp, newVars, states, Rs, deep);
@@ -1201,7 +1101,7 @@ void ImpKs::onStart()
 	*/
 
 
-	string input = g_input[4];//输出结果？
+	string input = g_input[0];//输出结果？
 	cout << "\n第零步结果：原始IMP程序" << endl;
 	cout << input << endl;
 
@@ -1215,10 +1115,18 @@ void ImpKs::onStart()
 		cout << "-------------"<<endl;
 	}
 
+	
 	vector<Statements> statements;
 	for (const auto& v : processes) {
-		Statements tmp;
+		Statements tmp;//对每个程序p1,p2分别处理
 		parseStatements(v, tmp);
+		cout << "输出statement" << endl;
+		//
+		for (const auto node : tmp)
+		{
+			output_node(node);
+		}
+		//
 		statements.push_back(tmp);
 	}
 

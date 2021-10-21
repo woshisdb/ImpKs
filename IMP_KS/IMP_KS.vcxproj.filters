@@ -18,12 +18,18 @@
     <ClInclude Include="imp_ks.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="basic_method.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imp_ks.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="basic_method.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

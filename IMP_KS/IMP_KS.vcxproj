@@ -87,6 +87,9 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,9 +126,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="basic_method.h" />
     <ClInclude Include="imp_ks.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basic_method.cpp" />
     <ClCompile Include="imp_ks.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
