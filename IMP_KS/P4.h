@@ -144,4 +144,22 @@ public:
 			lastLgsTmp[i] = lastLg;
 		}
 	}
+	string out_result(vector<string> lables, vector<KsR> Rs)
+	{
+		//输出所有S状态
+		string state_code;//------------------------输出状态s
+		state_code.append("All States:\n");
+		int index = 0;
+		for (const auto& v : lables) {
+			state_code.append(formatString("S%d:(%s)", index++, v.c_str()));
+		}
+
+		state_code.append("\n");
+		index = 0;
+		for (const auto& v : Rs) {
+			if (!v.toString().empty())
+				state_code.append(formatString("R%d:= %s", index++, v.toString().c_str()));
+		}
+		return state_code;
+	}
 };

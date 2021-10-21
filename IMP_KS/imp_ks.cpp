@@ -175,22 +175,10 @@ void ImpKs::onStart()
 	program3.to_label(lgss,pcs,relations, lables,lastLgs,states, Rs,vars);
 	program3.createKsLables(lgss, pcs, relations, lables, lastLgs, vars, states, Rs);
 
+	string result = program3.out_result(lables,Rs);
 
-
-	//输出所有S状态
-	string state_code;//------------------------输出状态s
-	state_code.append("All States:\n");
-	int index = 0;
-	for (const auto& v : lables) {
-		state_code.append(formatString("S%d:(%s)", index++, v.c_str()));
-	}
-
-	state_code.append("\n");
-	index = 0;
-	for (const auto& v : Rs) {
-		if (!v.toString().empty())
-			state_code.append(formatString("R%d:= %s", index++, v.toString().c_str()));
-	}
 	cout << "\n第四步数据：KS状态机描述" << endl;
-	cout << state_code << endl;
+	cout << result<< endl;
+
+	
 }
