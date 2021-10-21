@@ -17,7 +17,5 @@ public:
 	ImpKs();
     void onStart();
 
-private:
-    void showTip(const string& tip);
 
 };
