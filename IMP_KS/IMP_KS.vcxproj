@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="basicStruct.h" />
     <ClInclude Include="basic_method.h" />
     <ClInclude Include="imp_ks.h" />
     <ClInclude Include="P1.h" />

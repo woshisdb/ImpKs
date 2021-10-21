@@ -2,6 +2,7 @@
 #include "imp_ks.h"
 #include"P1.h"
 #include "basic_method.h"
+#include "basicStruct.h"
 #include <iostream>
 #include <cassert>
 #include <string>
@@ -15,98 +16,6 @@
 
 using namespace std;
 
-template<typename ... Args>
-static std::string formatString(const std::string &format, Args ... args)
-{
-	auto size = std::snprintf(nullptr, 0, format.c_str(), args ...) + 1; // Extra space for '\0'
-	std::unique_ptr<char[]> buf(new char[size]);
-	std::snprintf(buf.get(), size, format.c_str(), args ...);
-	string ret = std::string(buf.get(), buf.get() + size - 1); // We don't want the '\0' inside
-	return ret;
-}
-
-
-template<class nump, class sea>
-bool is_contains_list(nump l, sea aim)//检查链表中是否有aim
-{
-	bool has = false;
-	typename nump::iterator it = l.begin();
-	for (; it != l.end(); it++)
-	{
-		if (aim == *it)
-		{
-			has = true;
-			break;
-		}
-	}
-	return has;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-* 支持的语法：
-* 1.　赋值语句
-* a=0;
-* 
-* 2. 算数表达式
-* a=2-1 | 2+1 | 2*1
-* 
-* 3. 逻辑表达式
-* a=true | false | b == c| b <= c| b and c | b or c | not b
-* 
-* 4. 同步语句
-* cobegin p1||p2 coend;
-* 
-* 5. 顺序语句
-* p1;p2
-* 
-* 6. if 语句
-* if b then
-*	p0;
-* else
-*	p1;
-* endif;
-* 
-* 7. while 语句
-* while b do
-*	p;
-* endwhile;
-* 
-* 8. wait 语句
-* wait (b);
-* 
-* 变量的定义只能是小写字母
-* 变量取值范围[0,2]
-* boolean 类型变量取值范围[0,1]
-* 
-* 本程序的缺陷：
-* 1. 不支持运算符叠加.
-* 2. 不支持复合语句的嵌套.
-* 3. 变量需要初始值
-*/
-
-
-/**
-* \b 测试用例数据，阈值的测试用例，可以快速进行测试。
-* \a g_input 可以通过修改该值来添加更多的测试用例，测试用例
-*  需要满足IMP语法规则。
-*/
 const string g_input[] = {
 R"(a=0;
 b=2;
@@ -164,78 +73,7 @@ while true do
 endwhile;)",
 };
 
-static const int ModValue = 3;
 
-
-/**
-	\a StatementType 语句类型，目前支持4种符合语句类型，顺序语句，
-	条件语句，循环语句，等待语句。
-**/
-enum class StatementType {
-	Squence = 0,  //顺序语句
-	If,       //If 语句
-	While,    //While 语句
-	Wait      //wait 语句
-};
-
-
-/**
-	IMP变量定义
-	支持boolean 和 int 类型
-*/
-struct Variable
-{
-	bool operator==(const Variable& o) const {
-		return name == o.name && value == o.value;
-	}
-	enum Type
-	{
-		Int = 0,
-		Boolean
-	};
-	string toString(bool isPost = false) const {
-		if ( !isPost )
-			return formatString("%c=%d", name, value);
-		else
-			return formatString("%c'=%d", name, value);
-	}
-	Type  type;
-	char name;
-	int   value;
-};
-
-struct Statement;
-using Statements = vector<Statement>;
-using Variables = vector<Variable>;
-
-/**
-                                                                      
-*/
-struct Statement
-{
-	bool isNull() const {
-		return condition.empty() && seqBody.empty();
-	}
-	void reversedCondition() {
-		// 字符串处理
-		if (condition.find("not")!=-1) {
-			//condition.remove("not");
-			condition=remove(condition,"not");
-			//condition = condition.trimmed();
-		}
-		else {
-			condition = formatString("not %s", condition.c_str());
-		}
-	}
-	StatementType type;  //语句类型
-	string label;       //语句标签
-	string condition;
-	string seqBody;
-	Statements ifBody;
-	Statements elseBody;
-	Statements whileBody;
-	vector<Variable>  vars;
-};
 void output_node(Statement node)
 {
 	cout << "{" << endl;
@@ -263,6 +101,7 @@ void output_node(Statement node)
   \a string opr 操作
   \a vector<Variable> vars;
 */
+
 struct FirstOrderLogical
 {
 public:
@@ -496,145 +335,6 @@ struct KsR
 
 
 
-//解析出并发的代码段
-//如果之后一个代码段，说明没有并发，退化到单线程执行
-
-/*
-vector<string> parseCoProcesses( const string &text ) {
-	vector<string> processes;
-	vector<string> processTags;  //代码段标签
-
-	std::regex re("cobegin(.+)coend");
-	std::smatch m;
-	if (std::regex_search(text, m, re)) {
-		string processTmp = string(m[1]);
-		//processTmp.remove(' ');
-		processTmp = remove(processTmp, " ");
-		//processTags = processTmp.split("||");
-		processTags = split(processTmp, "||");
-	}
-	
-
-	//如果没有并行程序，则整个输入就是一个单线程执行的程序
-	if (processTags.empty()) {
-		//return processes << text;  //?
-		processes.push_back(text);//?
-		return processes;//?
-	}
-
-	//如果有并行程序，则解析出各个并行程序段
-	for (auto& v : processTags) {
-		cout << v;
-		std::regex re(v + "::([^:]+)");
-		std::smatch m;
-		if (std::regex_search(text, m, re)) {
-			string split = string(m[1]);
-			//split = split.left(split.lastIndexOf(';') + 1);//
-			split = split.substr(0,lastIndexOf(split,';') + 1);//
-
-			split = trimmed(split);
-			//processes << split;
-			processes.push_back(split);
-			//return processes;
-		}
-	}
-
-	return processes;
-}
-*/
-
-//解析 wait 语句
-Statement parseWait(const string& input) {
-	Statement sm;
-	string condition;
-	std::regex re("wait\\((.+)\\)");
-	std::smatch m;
-	if (std::regex_search(input, m, re)) {
-		condition = trimmed(string(m[1]));
-	
-		sm.type = StatementType::Wait;
-		sm.condition = condition;
-	}
-	return sm;
-}
-
-//解析顺序语句
-Statements parseSequence( const string &input ) {
-	Statements sms;
-	string inputTrimmed = trimmed(input);
-	//vector<string> list = inputTrimmed.split(';', Qt::SkipEmptyParts);
-	vector<string> list = split(inputTrimmed, ";");
-	for (auto& v : list) {
-		Statement sm;
-		v = trimmed(v);
-		//顺序语句里面可能会包含wait语句
-		if (v.find("wait") != -1) {
-			sm = parseWait(input);
-		}
-		else {
-			sm.type = StatementType::Squence;
-			sm.seqBody = v;
-		}
-		sms.push_back(sm);
-	}
-	return sms;
-}
-
-bool parseStatements(const string& input, Statements& statements);
-
-//解析 if 语句
-Statement parseIf(const string& input) {
-	Statement sm;
-	string inputNew = input;
-	//inputNew.remove('\n');
-	inputNew = remove(inputNew, "\n");
-	string condition, ifBody, elseBody;
-	
-	if (input.find("else") != -1) {
-		// QRegularExpression re("if(.+)then(.+)else(.+)endif;", QRegularExpression::MultilineOption);
-		std::regex re("if(.+)then(.+)else(.+)endif;"); // TODO: multiline
-		std::smatch m;
-		assert(std::regex_search(inputNew, m, re));
-		condition = trimmed(string(m[1]));
-		ifBody = trimmed(string(m[2]));
-		elseBody = trimmed(string(m[3]));
-	}
-	else {
-		std::regex re("if(.+)then(.+)endif"); // TODO: multiline
-		std::smatch m;
-		assert(std::regex_search(inputNew, m, re));
-		condition = trimmed(string(m[1]));
-		ifBody = trimmed(string(m[2]));
-	}
-
-	sm.type = StatementType::If;
-	sm.condition = condition;
-	parseStatements(ifBody, sm.ifBody);
-	parseStatements(elseBody, sm.elseBody);
-
-	return sm;
-}
-
-//解析while语句
-Statement parseWhile(const string& input) {
-	string inputNew = input;
-	//inputNew.remove('\n');
-	inputNew = remove(inputNew, "\n");
-	Statement sm;
-	string condition, body;
-
-	std::regex re("while(.+)do(.+)end");
-	std::smatch m;
-	if (std::regex_search(inputNew, m, re)) {
-		condition = trimmed(string(m[1]));
-		body = trimmed(string(m[2]));
-		sm.type = StatementType::While;
-		sm.condition = condition;
-		parseStatements(body, sm.whileBody);
-	}
-
-	return sm;
-}
 
 //将关联语句转换为逻辑公式
 static FirstOrderLogical toFormula(const Statement& pre, const Statement& post) {
@@ -703,105 +403,7 @@ vector<FirstOrderLogical> toFormula(const Statements& statements, Statement &out
 	return list;
 }
 
-/*
-//用于绘图的窗口
-class KsGraphicDrawer: public QLabel {
-public:
-	KsGraphicDrawer( const vector<string> &lables, 
-		const vector<pair<string, string>> & relations ) 
-		: _labels(lables)
-		, _relations(relations)
-	{
-	}
 
-protected:
-	void paintEvent(QPaintEvent*);
-
-private:
-	vector<pair<string, string>> _relations;
-	vector<string> _labels;
-	QMap<string, QRectF> _labelsGem;
-};
-
-//绘制箭头
-void calcVertexes(double start_x, double start_y, double end_x, double end_y, double& x1, double& y1, double& x2, double& y2)
-{
-	double arrow_lenght_ = 6;//箭头长度，一般固定
-	double arrow_degrees_ = 0.5;//箭头角度，一般固定
-
-	double angle = atan2(end_y - start_y, end_x - start_x) + 3.1415926;
-
-	x1 = end_x + arrow_lenght_ * cos(angle - arrow_degrees_);//求得箭头点1坐标
-	y1 = end_y + arrow_lenght_ * sin(angle - arrow_degrees_);
-	x2 = end_x + arrow_lenght_ * cos(angle + arrow_degrees_);//求得箭头点2坐标
-	y2 = end_y + arrow_lenght_ * sin(angle + arrow_degrees_);
-}
-
-//绘制KS结构图
-void KsGraphicDrawer::paintEvent(QPaintEvent*)
-{
-	static const int w = 90;
-	static const int h = 60;
-	static const int hSpan = 40;
-	static const int vSpan = 40;
-	QPainter painter(this);
-
-	painter.drawText(QPoint(hSpan, vSpan/2), "Kripke Structure:");
-
-	int n = 0;
-	QSize size(w, h);
-	int yPos = 0;
-	int col = 0;
-	//绘制所有的Label
-	while (n < _labels.size()) {
-		++col;
-		yPos += h + vSpan;
-		for (int n1 = 0; n1 < col; ++n1) {
-			if (n >= _labels.size()) {
-				break;
-			}
-			QRect rect(n1 * (w+hSpan), yPos, size.width(), size.height());
-			painter.drawEllipse(rect);
-			//painter.drawText(rect, Qt::AlignCenter, _labels.at(n).empty() ? "Begin": _labels.at(n));
-			painter.drawText(rect, Qt::AlignCenter, (*at(_labels,n)).empty() ? "Begin" : *at(_labels,n));
-			_labelsGem[*at(_labels,n)] = rect;
-			++n;
-		}
-	}
-
-	//绘制关系箭头
-	for (const auto& v : _relations) {
-		//结束标签
-		if( v.second.empty() )
-			continue;
-
-		//自调用
-		if (v.first == v.second) {	
-			QRectF rct = _labelsGem.value(v.first);
-			painter.drawLine(rct.center().x(), rct.top(), rct.right()+5, rct.top() );
-			painter.drawLine(rct.right()+5, rct.top(), rct.right() + 5, rct.center().y());
-
-			QPointF s(rct.right() + 5, rct.center().y());
-			QPointF e(rct.right(), rct.center().y());
-			double x1, y1, x2, y2;
-			calcVertexes(s.x(), s.y(), e.x(), e.y(), x1, y1, x2, y2);
-			painter.drawLine(s, e);
-			painter.drawLine(e, { x1, y1 });
-			painter.drawLine(e, { x2, y2 });
-			continue;
-		}
-		double x1, y1, x2, y2;
-		QPointF start = _labelsGem.value(v.first).center();
-		start.setY(start.y());
-		QPointF end = _labelsGem.value(v.second).center();
-		end.setY(end.y() - 10);
-		calcVertexes(start.x(), start.y(), end.x(), end.y(), x1, y1, x2, y2);
-		painter.drawLine(start, end);
-		painter.drawLine(end, { x1, y1 });
-		painter.drawLine(end, { x2, y2 });
-	}
-}
-*/
 
 //构造,初始化业务类
 ImpKs::ImpKs()
@@ -811,6 +413,7 @@ ImpKs::ImpKs()
 
 
 //将输入代码解析为语法树
+/*
 bool parseStatements(const string& input, Statements& statements) {
 	int s = 0;
 	int e = 0;
@@ -853,6 +456,7 @@ bool parseStatements(const string& input, Statements& statements) {
 	}
 	return true;
 }
+*/
 
 void changeValue(Variables &vars, char var, int value) {
 	bool find = false;
@@ -1093,7 +697,7 @@ void ImpKs::onStart()
 	vector<Statements> statements;
 	for (const auto& v : processes) {
 		Statements tmp;//对每个程序p1,p2分别处理
-		parseStatements(v, tmp);
+		program_0.parseStatements(v, tmp);
 		cout << "输出statement" << endl;
 		//
 		for (const auto node : tmp)
