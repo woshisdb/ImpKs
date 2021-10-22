@@ -86,6 +86,16 @@ typedef struct json_node{
 	string all;
 	vector<val> vals;
 	string no;//pcֵ
+	string to_string()
+	{
+		string res;
+		for (const auto& i : vals)
+		{
+			res += ",";
+			res += i.u + "=" + i.v;
+		}
+		return res;
+	}
 };
 typedef struct edge {
 	string u;
@@ -166,7 +176,7 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 		{
 			res += ",";
 		}
-		res += " {\"id\": " + h[i].no + "," + " \" text \" : \"" + h[i].no + " \"}";
+		res =res+ " {\"id\": " +" \" "+ h[i].no+" \" " + "," + " \" text \" : \"" + h[i].no +h[i].to_string()+ " \"}"+"\n";
 	}
 	res += "],";
 	res += " \"linkDataArray\": [  ";
@@ -174,9 +184,9 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 	{
 		if (i != 0)
 			res += ",";
-		res += "{ \"from\":" + eg[i].u + ", \"to\":"+eg[i].v;
+		res =res+ "{ \"from\":"+" \" "  +eg[i].u + " \" " + ", \"to\":"+ " \" " +eg[i].v+ " \" " +"}\n";
 	}
-	res += "]}";
+	res += "]\n}";
 	cout << res;
 }
 
