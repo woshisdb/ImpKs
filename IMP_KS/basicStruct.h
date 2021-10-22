@@ -114,16 +114,16 @@ public:
 
 	string toString() const {
 		if (!condition.empty()) {
-			return formatString("pc=%s and pc'=%s and (%s) and SAME(V)", preLable.c_str(), postLable.c_str(), condition.c_str());
+			return formatString("pc=%s … pc'=%s and (%s) … SAME(V)", preLable.c_str(), postLable.c_str(), condition.c_str());
 		}
 		else {
-			string tmp = formatString("pc=%s and pc'=%s and (%s)", preLable.c_str(), postLable.c_str(), opr.c_str());
+			string tmp = formatString("pc=%s … pc'=%s … (%s)", preLable.c_str(), postLable.c_str(), opr.c_str());
 			string var = findAssignVariable(opr);
 			if (var.empty()) {
-				tmp += " and SAME(V)";
+				tmp += " … SAME(V)";
 			}
 			else {
-				tmp += formatString(" and SAME(V\\{%s})", var.c_str());
+				tmp += formatString(" … SAME(V\\{%s})", var.c_str());
 			}
 			return tmp;
 		}

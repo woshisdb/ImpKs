@@ -7,7 +7,7 @@
 using namespace std;
 class P4 {
 public:
-	void to_label(vector<vector<FirstOrderLogical>> &lgss,vector<string> &pcs, vector<pair<string, string>> &relations, vector<string> &lables, vector<FirstOrderLogical> &lastLgs, vector<string> &states, vector<KsR> &Rs,Variables &vars)
+	void to_label(vector<vector<FirstOrderLogical>> &lgss, vector<string> &pcs, vector<pair<string, string>> &relations, vector<string> &lables, vector<FirstOrderLogical> &lastLgs, vector<string> &states, vector<KsR> &Rs, Variables &vars)
 	{
 		for (const auto& v : lgss) {
 			if (lgss.size() > 1) {
@@ -157,7 +157,7 @@ public:
 		}
 		index = 0;
 		for (const auto& v : Rs) {
-			
+
 			if (!v.toString().empty())
 				state_rela.append(formatString("R%d:= %s\n", index++, v.toString().c_str()));
 		}

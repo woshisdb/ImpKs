@@ -14,7 +14,7 @@ class ImpKs
 {
 
 public:
-    void onStart();
+	void onStart();
 
 
 };

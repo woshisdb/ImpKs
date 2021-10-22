@@ -23,9 +23,7 @@ public:
 		if (statements.empty())
 			return vector<FirstOrderLogical>();
 		if (out.label.empty()) {
-			//string prefix = statements.at(0).label.left(1);
-			string prefix = (statements[0]).label.substr(0, 1);
-			//split = split.substr(0, lastIndexOf(split, ';') + 1);//
+			string prefix = (statements[0]).label.substr(0, 2);
 			out.label = prefix + "E";
 		}
 
@@ -75,44 +73,70 @@ public:
 	}
 
 
-	vector<vector<FirstOrderLogical>> to_logic(vector<Statements> statements,string &logic_code)
+	vector<vector<FirstOrderLogical>> to_logic(vector<Statements> statements, string &logic_code)
 	{
-		logic_code.append("First order logical formula:\n"); 
+		logic_code.append("First order logical formula:\n");
 		//string logic_code;
 		vector<vector<FirstOrderLogical>> lgss;
 		bool hasPc = statements.size() > 1;
+
+		if (hasPc == false)
+		{
+			//开始状态
+			string beg;
+			beg = "pc=L0_m ∧ pc'=L0_1\n";
+			logic_code.append(beg);
+		}
+		else
+		{
+			string beg;
+			beg = "pc=l ∧ pc'= ⊥";//pc1'= l∧...∧pcn'= ln∧
+			for (int i = 0; i < statements.size(); i++)
+			{
+				beg += " ∧ pc'" + to_string(i) + "=L" + to_string(i) + "_m";
+			}
+			beg += "\n";
+			logic_code.append(beg);
+		}
 		for (int i = 0; i < statements.size(); ++i) {
 			Statement out;
 			vector<FirstOrderLogical> formulas = toFormula(statements[i], out);
 			lgss.push_back(formulas);
-			
+
 			for (const auto& v : formulas) {
-				if (hasPc) {
+				if (hasPc) {//多进程
+
 					string pc = formatString("pc%d", i);
 					string formulaNew = v.toString();
 					formulaNew.replace(formulaNew.find("pc"), 2, pc);
-					logic_code.append(formatString("pc=%s and %s", pc.c_str(), formulaNew.c_str()));
+					formulaNew.replace(formulaNew.find("pc'"), 2, pc);
+					formulaNew.append(formatString(" ∧ SAME(PC\{%s})", pc.c_str()));
+					logic_code.append(formulaNew);
+					//logic_code.append(formatString("pc=%s ∧ %s", pc.c_str(), formulaNew.c_str()));
+
 				}
 				else
 					logic_code.append(v.toString());
+
 				logic_code.append("\n");
-				
-				logic_code.append("{\n");
-				logic_code.append("prelabel:"+v.preLable+"\n");
-				logic_code.append("postlabel:" + v.postLable + "\n");
-				logic_code.append("condition:" + v.condition + "\n");
-				logic_code.append("opr:" + v.opr + "\n");
-				for (const auto t : v.vars)
-				{
-					logic_code.append(t.type+"-------");
-					logic_code.append(t.name + "=");
-					logic_code.append(t.value+";\n");
-				}
-				logic_code.append("\n}\n");
-				
+
+
+
 			}
-			
+			//
+		}
+		if (hasPc == true)
+		{
+			string end;
+			end = "pc=⊥ ∧ pc'=l'";
+			for (int i = 0; i < statements.size(); i++)
+			{
+				end.append(" ∧ pc" + to_string(i) + "=L" + to_string(i) + "E" + " ∧ pc" + to_string(i) + "'" + "=⊥");
+			}
+			end += "\n";
+			logic_code.append(end);
 		}
 		return lgss;
 	}
+
 };

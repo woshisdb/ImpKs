@@ -9,7 +9,8 @@ class P2 {
 // 一阶逻辑公式需要使用语句标签
 // 同时也可以用来展示带标签的代码段
 public:
-	int dfs_to_label(Statements &progress,string label,int &foot)
+
+	int dfs_to_label(Statements &progress, string label, int &foot)
 	{
 		if (progress.empty())
 		{
@@ -17,12 +18,12 @@ public:
 		}
 		else
 		{
-			for (int i=0;i<progress.size();i++)
+			for (int i = 0; i < progress.size(); i++)
 			{
 				progress[i].label = label + std::to_string(++foot);
 				if (!progress[i].ifBody.empty())
 				{
-					dfs_to_label(progress[i].ifBody,label,++foot);
+					dfs_to_label(progress[i].ifBody, label, ++foot);
 					dfs_to_label(progress[i].elseBody, label, ++foot);
 				}
 				if (!progress[i].whileBody.empty())
@@ -35,12 +36,12 @@ public:
 
 	void createlabel(vector<Statements> &progress)//所有进程打上标签
 	{
-		for (int i = 0;i < progress.size();i++)
+		for (int i = 0; i < progress.size(); i++)
 		{
-			string n_label = "L"+ std::to_string(i);
+			string n_label = "L" + std::to_string(i);
 			n_label += "_";
 			int root = 0;
-			dfs_to_label(progress[i],n_label,root);
+			dfs_to_label(progress[i], n_label, root);
 
 		}
 	}
@@ -84,8 +85,30 @@ public:
 		}
 	}
 
+	string out_result(vector<Statements> &statements)
+	{//输出带标签的代码
 
-	void dfs_show(Statements progress, string &res,string spac)
+		string label_code;
+		label_code.append("Labeled function:\n");
+		//ui.outputEdit->append("Labeled function:\n");
+		for (const auto& v : statements) {
+			vector<string> list;
+			string space;
+			statementToList(v, list, space);
+			//添加一个结束标签
+			string prefix = list[0].substr(0, 1);
+			list.push_back(prefix + "E:");
+			//ui.outputEdit->append(list.join('\n'));
+			label_code.append(jointList(list, "\n"));
+
+			label_code.append("\n\n");
+		}
+		cout << "\n第二步结果：打标签处理后的程序" << endl;
+		cout << label_code << endl;
+		return label_code;
+	}
+
+	void dfs_show(Statements progress, string &res, string spac)
 	{
 		if (progress.empty())
 			return;
@@ -99,27 +122,25 @@ public:
 			}
 			else if (v.type == StatementType::If) {
 				res += v.label + ": " + "if " + v.condition + " then\n";
-				dfs_show(v.ifBody, res, spac+"  ");
-				res += "     "+spac+"else\n";
-				dfs_show(v.elseBody, res,spac+"  ");
-				res += "     " +spac+"endif\n";
+				dfs_show(v.ifBody, res, spac + "  ");
+				res += "     " + spac + "else\n";
+				dfs_show(v.elseBody, res, spac + "  ");
+				res += "     " + spac + "endif\n";
 			}
 			else if (v.type == StatementType::While) {
-				res += v.label + ": " +spac+ "while " + v.condition + " do\n";
-				dfs_show(v.whileBody,res,spac+"    ");
-				res += "     "+spac+"endwhile;\n";
+				res += v.label + ": " + spac + "while " + v.condition + " do\n";
+				dfs_show(v.whileBody, res, spac + "    ");
+				res += "endwhile;\n";
 			}
 		}
 	}
-	void show_codes(vector<Statements> &progress,string &res)
+	void show_codes(vector<Statements> &progress, string &res)
 	{
 		res += "输出打标签的函数：\n";
-		for (int i=0;i<progress.size();i++)
+		for (int i = 0; i < progress.size(); i++)
 		{
-			res = res + "P" + to_string(i)+":\n";
-			dfs_show(progress[i],res,"");
-			res += "L" + to_string(i)+ "E:\n";
-			res += "\n";
+			res += "P1:\n";
+			dfs_show(progress[i], res, "");
 		}
 	}
 };

@@ -8,7 +8,7 @@ class P1
 {
 public:
 	//解析出并发的代码段
-    //如果之后一个代码段，说明没有并发，退化到单线程执行
+	//如果之后一个代码段，说明没有并发，退化到单线程执行
 	vector<string> parseCoProcesses(const string &text) {
 		vector<string> processes;
 		vector<string> processTags;  //代码段标签
@@ -47,7 +47,7 @@ public:
 
 		return processes;
 	}
-	
+
 	bool parseStatements(const string& input, Statements& statements);
 
 
@@ -146,7 +146,7 @@ public:
 		return sm;
 	}
 
-	
+
 
 };
 
@@ -155,8 +155,6 @@ bool P1::parseStatements(const string& input, Statements& statements) {
 	int e = 0;
 	while (s < input.length())
 	{
-		//int pos = input.indexOf(QRegularExpression("(if|while)"), s);
-		//int pos = input.find(QRegularExpression("(if|while)"), s);
 		int pos = input.find("if", s);
 		if (pos == -1) {
 			pos = input.find("while", s);
@@ -170,19 +168,16 @@ bool P1::parseStatements(const string& input, Statements& statements) {
 		}
 		else {
 			if (pos > s) {
-				//statements. merge( parseSequence(input.mid(s, pos - s)) );
 				auto states_tmp = parseSequence(input.substr(s, pos - s));
 				statements.insert(statements.end(), states_tmp.begin(), states_tmp.end());
 			}
 			s = pos;
 			if (input.at(pos) == 'i') {
-				//e = input.indexOf("endif");
 				e = input.find("endif");
 				e += 6;
 				statements.push_back(parseIf(input.substr(s, e - s)));
 			}
 			else {
-				//e = input.indexOf("endwhile");
 				e = input.find("endwhile");
 				e += 9;
 				statements.push_back(parseWhile(input.substr(s, e - s)));

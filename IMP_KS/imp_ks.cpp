@@ -191,7 +191,7 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 //开始执行程序
 void ImpKs::onStart()
 {
-	string input = g_input[0];//输出结果？
+	string input = g_input[4];//输出结果？
 	cout << "\n第零步结果：原始IMP程序" << endl;
 	cout << input << endl;
 
