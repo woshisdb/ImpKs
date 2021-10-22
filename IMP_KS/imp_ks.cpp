@@ -135,15 +135,13 @@ vector<json_node> analy(string head)
 	json_node U;
 	U.no = "U";
 	res.push_back(U);
-	json_node PE;
-	PE.no = "PE";
-	res.push_back(PE);
 	return res;
 }
 edge edg_ju(string ge)
 {
 	edge res; //node.erase(0, node.find('(') + 1);
-	vector<string> temp = split( ge.erase(0, ge.find('=')+1) ," -> ");
+	ge=ge.erase(0, ge.find('=') + 1);
+	vector<string> temp = split(ge,"->");
 	temp[0] = remove(temp[0], "(");
 	temp[0] = remove(temp[0], ")");
 	temp[1] = remove(temp[1], "(");
@@ -176,7 +174,7 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 		{
 			res += ",";
 		}
-		res =res+ " {\"id\": " +" \" "+ h[i].no+" \" " + "," + " \" text \" : \"" + h[i].no +h[i].to_string()+ " \"}"+"\n";
+		res =res+ " {\"id\": " +" \" "+ h[i].no+" \" " + "," + " \"text\" : \"" + h[i].no +h[i].to_string()+ " \"}"+"\n";
 	}
 	res += "],";
 	res += " \"linkDataArray\": [  ";
@@ -193,7 +191,7 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 //开始执行程序
 void ImpKs::onStart()
 {
-	string input = g_input[2];//输出结果？
+	string input = g_input[0];//输出结果？
 	cout << "\n第零步结果：原始IMP程序" << endl;
 	cout << input << endl;
 
@@ -215,8 +213,11 @@ void ImpKs::onStart()
 
 	//给所有语句打上标签
 	P2 program_1;
-	program_1.labledStatements(statements);
-	string label_code=program_1.out_result(statements);
+	program_1.createlabel(statements);
+	string label_code;
+	program_1.show_codes(statements, label_code);
+	//label_code= program_1.out_result(statements);
+	cout << label_code << endl;
 
 	//输出逻辑公式
 	P3 program_2;

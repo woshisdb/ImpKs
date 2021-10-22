@@ -75,6 +75,7 @@ string trimmed(string origin)
 	return origin;
 }
 
+
 vector<string> split(string str, string delim)
 {
 	vector<string> res;
