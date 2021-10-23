@@ -4,6 +4,7 @@
 #include"P2.h"
 #include"P3.h"
 #include"P4.h"
+#include"P5.h"
 #include "basic_method.h"
 #include "basicStruct.h"
 #include <iostream>
@@ -227,7 +228,6 @@ void ImpKs::onStart()
 	cout << "\n第三步结果：逻辑公式" << endl;
 	cout << logic_code << endl;
 	cout << "************************" << endl;
-
 	P4 program3;
 
 	vector<string> pcs;
@@ -247,5 +247,7 @@ void ImpKs::onStart()
 	cout << head << "\n" << eag;
 	vector<json_node> h=analy(head);
 	vector<edge> eg = judge(eag);
-	draw_json(h,eg);
+	//draw_json(h,eg);
+	P5 sa;
+	sa.change(lgss);
 }

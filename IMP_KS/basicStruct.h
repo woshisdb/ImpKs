@@ -114,7 +114,7 @@ public:
 
 	string toString() const {
 		if (!condition.empty()) {
-			return formatString("pc=%s … pc'=%s and (%s) … SAME(V)", preLable.c_str(), postLable.c_str(), condition.c_str());
+			return formatString("pc=%s … pc'=%s … (%s) … SAME(V)", preLable.c_str(), postLable.c_str(), condition.c_str());
 		}
 		else {
 			string tmp = formatString("pc=%s … pc'=%s … (%s)", preLable.c_str(), postLable.c_str(), opr.c_str());
@@ -207,6 +207,11 @@ public:
 			conditionNew = remove(conditionNew, "not");
 			conditionNew = trimmed(conditionNew);
 		}
+
+		if (conditionNew == "true")
+			return hasNot?!true:true;
+		if (conditionNew == "false")
+			return hasNot ? !false : false;
 
 		std::regex re("(\\w)\\s*([><=andotr]+)\\s*(\\w)");
 		std::smatch m;

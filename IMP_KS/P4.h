@@ -10,7 +10,7 @@ public:
 	void to_label(vector<vector<FirstOrderLogical>> &lgss, vector<string> &pcs, vector<pair<string, string>> &relations, vector<string> &lables, vector<FirstOrderLogical> &lastLgs, vector<string> &states, vector<KsR> &Rs, Variables &vars)
 	{
 		for (const auto& v : lgss) {
-			if (lgss.size() > 1) {
+			if (lgss.size() > 1) {//多进程
 				pcs.push_back("U");
 			}
 			else {
@@ -68,7 +68,8 @@ public:
 		//当前变量值
 		const Variables& vars,
 		vector<string> &states,
-		vector<KsR> &Rs, int deep = 0) {
+		vector<KsR> &Rs, int deep = 0)
+	{
 
 		++deep;
 		vector<string> tmp = pcs;
@@ -147,9 +148,6 @@ public:
 	}
 	void out_result(vector<string> lables, vector<KsR> Rs, string &state_code, string &state_rela)
 	{
-		//输出所有S状态
-		//string state_code;//------------------------输出状态s
-		//state_code.append("All States:\n");
 		int index = 0;
 		for (const auto& v : lables) {
 			state_code.append(formatString("S%d:(%s)\n", index++, v.c_str()));
