@@ -255,4 +255,9 @@ void ImpKs::onStart()
 	cout << gojs << endl;
 	ofstream fout("./view/show_data.js");
 	fout << gojs << endl;
+
+	// ä¯ÀÀÆ÷×Ô¶¯´ò¿ª»æÍ¼ÍøÒ³
+	string cmd = "start ./view/stateChart.html";
+	const char* command = cmd.c_str();
+	system(command);
 }

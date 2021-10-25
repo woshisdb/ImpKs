@@ -1,4 +1,4 @@
-var nodeDataArray =
+var nodeDataArray = 
 [{"id":0,"text":"L0_1 L1_1 ,t=0 "}
 ,{"id":1,"text":"L0_2 L1_1 ,t=0 "}
 ,{"id":2,"text":"L0_1 L1_3 ,t=0 "}
@@ -23,7 +23,7 @@ var nodeDataArray =
 ,{"id":21,"text":"L0_2 L1_3 ,t=2 "}
 ,{"id":22,"text":"L0_4 L1_3 ,t=2 "}
 ]
-var linkDataArray =
+var linkDataArray = 
 [{"from":0,"to":1}
 ,{"from":0,"to":2}
 ,{"from":1,"to":3}
