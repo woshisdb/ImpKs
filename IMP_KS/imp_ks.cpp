@@ -16,6 +16,7 @@
 #include <memory>
 #include <cstdio>
 #include <regex> 
+#include <fstream>
 
 using namespace std;
 
@@ -252,4 +253,6 @@ void ImpKs::onStart()
 	string gojs = sa.change(lgss);
 	cout << "go.js»æÍ¼Êý¾Ý:" << endl;
 	cout << gojs << endl;
+	ofstream fout("./view/show_data.js");
+	fout << gojs << endl;
 }
