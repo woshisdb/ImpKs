@@ -3,6 +3,7 @@
 #include <cassert>
 #include<queue>
 #include<regex>
+#include<sstream>
 #include"basic_method.h"
 #include"basicStruct.h"
 using namespace std;
@@ -149,7 +150,7 @@ public://pc0=L0_1 … pc0'=L0_2 … (t=0) … SAME(V\{t}) … SAME(PC{pc0})
 			}
 		}
 	}
-	void change(vector<vector<FirstOrderLogical>> in)
+	string change(vector<vector<FirstOrderLogical>> in)
 	{
 		Variables all_var;
 		for (int i = 0; i < in.size(); i++)
@@ -184,35 +185,37 @@ public://pc0=L0_1 … pc0'=L0_2 … (t=0) … SAME(V\{t}) … SAME(PC{pc0})
 		dfs_search(begin,in,0);
 		cout << nodes.size()<<"--------"<<ways.size() <<endl;
 
-		cout << "{ \"class\": \"go.GraphLinksModel\",\"nodeKeyProperty\" : \"id\",\"nodeDataArray\" : " << endl;
+		ostringstream sout;
+		sout << "{ \"class\": \"go.GraphLinksModel\",\"nodeKeyProperty\" : \"id\",\"nodeDataArray\" : " << endl;
 
-		cout << "[";
+		sout << "[";
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			if (i != 0)
-				cout << ",";
-			cout << "{" << endl;
-			cout << " \"id\":" + to_string(i) << ",\"text\":\"";
+				sout << ",";
+			sout << "{" << endl;
+			sout << " \"id\":" + to_string(i) << ",\"text\":\"";
 			for (const auto&u : nodes[i].pcs)
 			{
-				cout << u << " ";
+				sout << u << " ";
 			}
-			cout << ",";
+			sout << ",";
 			for (const auto&u : nodes[i].all_var)
 			{
-				cout << u.name << "=" << u.value << " ";
+				sout << u.name << "=" << u.value << " ";
 			}
-			cout << "\"}\n" << endl;
+			sout << "\"}\n" << endl;
 		}
-		cout << "]";
-		cout << ",\"linkDataArray\":\n";
-		cout << "[";
+		sout << "]";
+		sout << ",\"linkDataArray\":\n";
+		sout << "[";
 		for (int i = 0; i < ways.size(); i++)
 		{
 			if (i != 0)
-				cout << ",";
-			cout << "{\"from\":" + to_string( ways[i].from)+",\"to\":"+ to_string(ways[i].to)+"}\n";
+				sout << ",";
+			sout << "{\"from\":" + to_string( ways[i].from)+",\"to\":"+ to_string(ways[i].to)+"}\n";
 		}
-		cout << "]}";
+		sout << "]}";
+		return sout.str();
 	}
 };

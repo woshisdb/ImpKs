@@ -249,5 +249,7 @@ void ImpKs::onStart()
 	vector<edge> eg = judge(eag);
 	//draw_json(h,eg);
 	P5 sa;
-	sa.change(lgss);
+	string gojs = sa.change(lgss);
+	cout << "go.js»æÍ¼Êý¾Ý:" << endl;
+	cout << gojs << endl;
 }
