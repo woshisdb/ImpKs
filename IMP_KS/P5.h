@@ -62,7 +62,7 @@ vector<node> nodes;
 vector<len> ways;
 queue<node> que;
 class P5 {
-public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
+public://pc0=L0_1 ï¿½ï¿½ pc0'=L0_2 ï¿½ï¿½ (t=0) ï¿½ï¿½ SAME(V\{t}) ï¿½ï¿½ SAME(PC{pc0})
 	void bfs(node beg, vector<vector<FirstOrderLogical>> &in)
 	{
 		int origin_node = find(nodes,beg);
@@ -70,13 +70,13 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 		{
 			for (int j=0;j<in[i].size();j++)
 			{
-				if (in[i][j].preLable==beg.pcs[i])//µÚi¸ö½ø³ÌµÄpc==logicµÄpreLable
+				if (in[i][j].preLable==beg.pcs[i])//ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Ìµï¿½pc==logicï¿½ï¿½preLable
 				{
 					FirstOrderLogical temp = in[i][j];
-					temp.vars = beg.all_var;//¸ù¾ÝËùÓÐÌõ¼þÅÐ¶Ï
-					if (temp.condition.empty()==true)//²»ÓÃÅÐ¶Ï¾Í×ª»»
+					temp.vars = beg.all_var;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
+					if (temp.condition.empty()==true)//ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶Ï¾ï¿½×ªï¿½ï¿½
 					{
-						temp.assign();//Ò»¸öÐÂ×´Ì¬
+						temp.assign();//Ò»ï¿½ï¿½ï¿½ï¿½×´Ì¬
 						node newnode;
 						newnode.all_var = temp.vars;
 						newnode.pcs = beg.pcs;
@@ -93,7 +93,7 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 						a2b.to = no;
 						ways.push_back(a2b);
 					}
-					else//ÐèÒªÅÐ¶Ï×ª»»
+					else//ï¿½ï¿½Òªï¿½Ð¶ï¿½×ªï¿½ï¿½
 					{
 						if (temp.isConditionOk() == true)
 						{
@@ -119,11 +119,11 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 	}
 	void dfs_search(node &beg, vector<vector<FirstOrderLogical>> in,int deep)
 	{
-		if (deep==beg.all_var.size())//ËÑÍê×îºóÒ»¸ö¡£¡£¿ªÊ¼ÕýÊ½ËÑË÷
+		if (deep==beg.all_var.size())//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½
 		{
-			node ver = beg;//ÕÒµ½Ò»¸ö¿ªÊ¼½Úµã
-			nodes.push_back(ver);//½Úµã¼ÓÈë
-			que.push(ver);//¼ÓÈë¶ÓÁÐ
+			node ver = beg;//ï¿½Òµï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½Úµï¿½
+			nodes.push_back(ver);//ï¿½Úµï¿½ï¿½ï¿½ï¿½
+			que.push(ver);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			while(!que.empty())
 			{
 				node temp = que.front();
@@ -177,7 +177,7 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 		vector<string> pc;
 		for (int i=0;i<in.size();i++)
 		{
-			pc.push_back("L"+to_string(i)+"_1");//ËùÓÐµÄpc±êÇ©
+			pc.push_back("L"+to_string(i)+"_1");//ï¿½ï¿½ï¿½Ðµï¿½pcï¿½ï¿½Ç©
 		}
 		node begin;
 		begin.all_var = all_var;
@@ -186,15 +186,15 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 		cout << nodes.size()<<"--------"<<ways.size() <<endl;
 
 		ostringstream sout;
-		sout << "{ \"class\": \"go.GraphLinksModel\",\"nodeKeyProperty\" : \"id\",\"nodeDataArray\" : " << endl;
+		sout << "var nodeDataArray = " << endl;
 
 		sout << "[";
 		for (int i = 0; i < nodes.size(); i++)
 		{
 			if (i != 0)
 				sout << ",";
-			sout << "{" << endl;
-			sout << " \"id\":" + to_string(i) << ",\"text\":\"";
+			sout << "{";
+			sout << "\"id\":" + to_string(i) << ",\"text\":\"";
 			for (const auto&u : nodes[i].pcs)
 			{
 				sout << u << " ";
@@ -204,10 +204,10 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 			{
 				sout << u.name << "=" << u.value << " ";
 			}
-			sout << "\"}\n" << endl;
+			sout << "\"}" << endl;
 		}
-		sout << "]";
-		sout << ",\"linkDataArray\":\n";
+		sout << "]\n";
+		sout << "var linkDataArray = " << endl;
 		sout << "[";
 		for (int i = 0; i < ways.size(); i++)
 		{
@@ -215,7 +215,7 @@ public://pc0=L0_1 ¡Ä pc0'=L0_2 ¡Ä (t=0) ¡Ä SAME(V\{t}) ¡Ä SAME(PC{pc0})
 				sout << ",";
 			sout << "{\"from\":" + to_string( ways[i].from)+",\"to\":"+ to_string(ways[i].to)+"}\n";
 		}
-		sout << "]}";
-		return sout.str();
+		sout << "]";
+	return sout.str();
 	}
 };

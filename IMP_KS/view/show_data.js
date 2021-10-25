@@ -1,74 +1,30 @@
-var nodeDataArray = [{
-    "key":0,"text":"L0_1 L1_1 ,t=0 "}
-   
-   ,{
-    "key":1,"text":"L0_2 L1_1 ,t=0 "}
-   
-   ,{
-    "key":2,"text":"L0_1 L1_3 ,t=0 "}
-   
-   ,{
-    "key":3,"text":"L0_4 L1_1 ,t=0 "}
-   
-   ,{
-    "key":4,"text":"L0_2 L1_3 ,t=0 "}
-   
-   ,{
-    "key":5,"text":"L0_5 L1_1 ,t=0 "}
-   
-   ,{
-    "key":6,"text":"L0_4 L1_3 ,t=0 "}
-   
-   ,{
-    "key":7,"text":"L0_5 L1_3 ,t=0 "}
-   
-   ,{
-    "key":8,"text":"L0_1 L1_1 ,t=1 "}
-   
-   ,{
-    "key":9,"text":"L0_2 L1_1 ,t=1 "}
-   
-   ,{
-    "key":10,"text":"L0_1 L1_3 ,t=1 "}
-   
-   ,{
-    "key":11,"text":"L0_4 L1_1 ,t=1 "}
-   
-   ,{
-    "key":12,"text":"L0_2 L1_3 ,t=1 "}
-   
-   ,{
-    "key":13,"text":"L0_1 L1_4 ,t=1 "}
-   
-   ,{
-    "key":14,"text":"L0_4 L1_3 ,t=1 "}
-   
-   ,{
-    "key":15,"text":"L0_2 L1_4 ,t=1 "}
-   
-   ,{
-    "key":16,"text":"L0_4 L1_4 ,t=1 "}
-   
-   ,{
-    "key":17,"text":"L0_1 L1_1 ,t=2 "}
-   
-   ,{
-    "key":18,"text":"L0_2 L1_1 ,t=2 "}
-   
-   ,{
-    "key":19,"text":"L0_1 L1_3 ,t=2 "}
-   
-   ,{
-    "key":20,"text":"L0_4 L1_1 ,t=2 "}
-   
-   ,{
-    "key":21,"text":"L0_2 L1_3 ,t=2 "}
-   
-   ,{
-    "key":22,"text":"L0_4 L1_3 ,t=2 "}
-   
-   ]
-var linkDataArray = [{"from":0,"to":1}
+var nodeDataArray =
+[{"id":0,"text":"L0_1 L1_1 ,t=0 "}
+,{"id":1,"text":"L0_2 L1_1 ,t=0 "}
+,{"id":2,"text":"L0_1 L1_3 ,t=0 "}
+,{"id":3,"text":"L0_4 L1_1 ,t=0 "}
+,{"id":4,"text":"L0_2 L1_3 ,t=0 "}
+,{"id":5,"text":"L0_5 L1_1 ,t=0 "}
+,{"id":6,"text":"L0_4 L1_3 ,t=0 "}
+,{"id":7,"text":"L0_5 L1_3 ,t=0 "}
+,{"id":8,"text":"L0_1 L1_1 ,t=1 "}
+,{"id":9,"text":"L0_2 L1_1 ,t=1 "}
+,{"id":10,"text":"L0_1 L1_3 ,t=1 "}
+,{"id":11,"text":"L0_4 L1_1 ,t=1 "}
+,{"id":12,"text":"L0_2 L1_3 ,t=1 "}
+,{"id":13,"text":"L0_1 L1_4 ,t=1 "}
+,{"id":14,"text":"L0_4 L1_3 ,t=1 "}
+,{"id":15,"text":"L0_2 L1_4 ,t=1 "}
+,{"id":16,"text":"L0_4 L1_4 ,t=1 "}
+,{"id":17,"text":"L0_1 L1_1 ,t=2 "}
+,{"id":18,"text":"L0_2 L1_1 ,t=2 "}
+,{"id":19,"text":"L0_1 L1_3 ,t=2 "}
+,{"id":20,"text":"L0_4 L1_1 ,t=2 "}
+,{"id":21,"text":"L0_2 L1_3 ,t=2 "}
+,{"id":22,"text":"L0_4 L1_3 ,t=2 "}
+]
+var linkDataArray =
+[{"from":0,"to":1}
 ,{"from":0,"to":2}
 ,{"from":1,"to":3}
 ,{"from":1,"to":4}
