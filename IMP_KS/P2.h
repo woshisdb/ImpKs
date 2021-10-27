@@ -141,6 +141,7 @@ public:
 		{
 			res += "P1:\n";
 			dfs_show(progress[i], res, "");
+			res += "L" + to_string(i)+"E\n\n";
 		}
 	}
 };

@@ -117,13 +117,33 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 			}
 		}
 	}
+	int first_ok = 0;
 	void dfs_search(node &beg, vector<vector<FirstOrderLogical>> in,int deep)
 	{
 		if (deep==beg.all_var.size())//�������һ��������ʼ��ʽ����
 		{
-			node ver = beg;//�ҵ�һ����ʼ�ڵ�
-			nodes.push_back(ver);//�ڵ����
-			que.push(ver);//�������
+			first_ok++;
+			if (first_ok == 1&&beg.pcs.size()>1)
+			{
+				node star = beg;
+				star.all_var.clear();
+				for (int i = 0; i < star.pcs.size(); i++)
+				{
+					star.pcs[i] = "null";
+				}
+				nodes.push_back(star);//放入第0个节点
+			}
+			node ver = beg;
+			nodes.push_back(ver);
+			if (beg.pcs.size() > 1)//表示并行
+			{
+				int end_no=find(nodes, ver);
+				len temp;
+				temp.from = 0;
+				temp.to = end_no;
+				ways.push_back(temp);
+			}
+			que.push(ver);
 			while(!que.empty())
 			{
 				node temp = que.front();
