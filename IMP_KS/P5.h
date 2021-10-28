@@ -215,16 +215,23 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 				sout << ",";
 			sout << "{";
 			sout << "\"id\":" + to_string(i) << ",\"text\":\"";
+			string flag_null = "";
 			for (const auto&u : nodes[i].pcs)
 			{
 				sout << u << " ";
+				flag_null = u;
 			}
 			sout << ",";
 			for (const auto&u : nodes[i].all_var)
 			{
 				sout << u.name << "=" << u.value << " ";
 			}
-			sout << "\"}" << endl;
+			if (flag_null == "null") {
+				sout << "\",\"category\":\"Start\"";
+			} else {
+				sout << "\"";
+			}
+			sout << "}" << endl;
 		}
 		sout << "]\n";
 		sout << "var linkDataArray = " << endl;

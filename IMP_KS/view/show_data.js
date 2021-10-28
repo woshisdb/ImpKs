@@ -1,5 +1,5 @@
 var nodeDataArray = 
-[{"id":0,"text":"null null ,"}
+[{"id":0,"text":"null null ,","category":"Start"}
 ,{"id":1,"text":"L0_1 L1_1 ,t=0 "}
 ,{"id":2,"text":"L0_2 L1_1 ,t=0 "}
 ,{"id":3,"text":"L0_1 L1_3 ,t=0 "}
