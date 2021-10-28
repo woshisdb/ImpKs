@@ -5,6 +5,6 @@ using namespace std;
 int main() {
 	cout << "Start IMPtoKS" << endl;
 	ImpKs impKs;
-	impKs.onStart();
+	impKs.run();
 	return 0;
 }
