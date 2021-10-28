@@ -2,6 +2,7 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include <cassert>
 #include"basic_method.h"
 using namespace std;
 static const int ModValue = 3;
