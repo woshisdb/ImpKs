@@ -123,7 +123,7 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 		if (deep==beg.all_var.size())//�������һ��������ʼ��ʽ����
 		{
 			first_ok++;
-			if (first_ok == 1&&beg.pcs.size()>1)
+			if (first_ok == 1)
 			{
 				node star = beg;
 				star.all_var.clear();
@@ -135,14 +135,14 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 			}
 			node ver = beg;
 			nodes.push_back(ver);
-			if (beg.pcs.size() > 1)//表示并行
-			{
+			//if (beg.pcs.size() > 1)//表示并行
+			//{
 				int end_no=find(nodes, ver);
 				len temp;
 				temp.from = 0;
 				temp.to = end_no;
 				ways.push_back(temp);
-			}
+			//}
 			que.push(ver);
 			while(!que.empty())
 			{

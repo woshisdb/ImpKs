@@ -5,7 +5,7 @@
 #include"basicStruct.h"
 using namespace std;
 class P2 {
-	// 将所有语句打上标签
+// 将所有语句打上标签
 // 一阶逻辑公式需要使用语句标签
 // 同时也可以用来展示带标签的代码段
 public:
