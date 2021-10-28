@@ -1,0 +1,9 @@
+(x=0;
+y=2;
+if x<y then
+    while x<2 do
+        x=x+1;
+    endwhile;
+else 
+    y=y+1;
+endif;)

@@ -191,15 +191,14 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 }
 
 //开始执行程序
-void ImpKs::run()
+void ImpKs::run(string code)
 {
-	string input = g_input[0];//输出结果？
 	cout << "\n第零步结果：原始IMP程序" << endl;
-	cout << input << endl;
+	cout << code << endl;
 
 	//解析出所有程序段
 	P1 program_0;
-	vector<string> processes =program_0.parseCoProcesses(input);
+	vector<string> processes =program_0.parseCoProcesses(code);
 	cout << "\n第零步结果：输出解析程序段" << endl;
 	for (int i = 0; i < processes.size(); i++)
 	{

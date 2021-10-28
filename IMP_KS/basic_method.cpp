@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include "basic_method.h"
 string jointList(vector<string> l, string aim)
 {

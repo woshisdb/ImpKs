@@ -14,7 +14,7 @@ class ImpKs
 {
 
 public:
-	void run();
+	void run(string code);
 
 
 };
