@@ -146,19 +146,5 @@ public:
 			lastLgsTmp[i] = lastLg;
 		}
 	}
-	void out_result(vector<string> lables, vector<KsR> Rs, string &state_code, string &state_rela)
-	{
-		int index = 0;
-		for (const auto& v : lables) {
-			state_code.append(formatString("S%d:(%s)\n", index++, v.c_str()));
 
-		}
-		index = 0;
-		for (const auto& v : Rs) {
-
-			if (!v.toString().empty())
-				state_rela.append(formatString("R%d:= %s\n", index++, v.toString().c_str()));
-		}
-
-	}
 };

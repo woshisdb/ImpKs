@@ -6,6 +6,7 @@
 #include<sstream>
 #include"basic_method.h"
 #include"basicStruct.h"
+#include"P4.h"
 using namespace std;
 typedef struct node{
 	vector<string> pcs;
@@ -63,6 +64,20 @@ vector<len> ways;
 queue<node> que;
 class P5 {
 public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(PC{pc0})
+
+	void changeValue(Variables &vars, char var, int value) {
+		bool find = false;
+		for (auto& v : vars) {
+			if (v.name == var) {
+				v.value = value;
+				find = true;
+				break;
+			}
+		}
+		if (!find)
+			//vars << Variable{ Variable::Int, var, value };
+			vars.push_back(Variable{ Variable::Int, var, value });
+	}
 	void bfs(node beg, vector<vector<FirstOrderLogical>> &in)
 	{
 		int origin_node = find(nodes,beg);
@@ -76,7 +91,8 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 					temp.vars = beg.all_var;//�������������ж�
 					if (temp.condition.empty()==true)//�����жϾ�ת��
 					{
-						temp.assign();//һ����״̬
+						pair<char, int> newvar = temp.assign();
+						changeValue(temp.vars,newvar.first,newvar.second);//赋值新的值
 						node newnode;
 						newnode.all_var = temp.vars;
 						newnode.pcs = beg.pcs;
