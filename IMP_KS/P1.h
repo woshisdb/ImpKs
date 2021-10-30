@@ -7,8 +7,6 @@ using namespace std;
 class P1
 {
 public:
-	//解析出并发的代码段
-	//如果之后一个代码段，说明没有并发，退化到单线程执行
 	vector<string> parseCoProcesses(const string &text) {
 		vector<string> processes;
 		vector<string> processTags;  //代码段标签
@@ -24,8 +22,8 @@ public:
 
 		//如果没有并行程序，则整个输入就是一个单线程执行的程序
 		if (processTags.empty()) {
-			processes.push_back(text);//?
-			return processes;//?
+			processes.push_back(text);
+			return processes;
 		}
 
 		//如果有并行程序，则解析出各个并行程序段

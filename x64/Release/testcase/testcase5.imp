@@ -1,9 +1,7 @@
-x=y+1; 
-z=z+2;
-while y<2 do
-    if x<y then 
-        x=x+1; 
-    else 
-        y=y+1;
-    endif;
-endwhile;
+if x<y then
+    while x<2 do
+        x=x+1;
+    endwhile;
+else 
+    y=y+1;
+endif;

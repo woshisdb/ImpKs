@@ -189,7 +189,7 @@ public:
 
 		return true;
 	}
-	bool conditionval(char &yes) {
+	bool conditionval(char &left,char right) {
 		if (condition.empty())
 			return false;
 		if (condition == "true")
@@ -214,7 +214,11 @@ public:
 		std::smatch m;
 		assert(std::regex_search(conditionNew, m, re));
 
-		yes = string(m[1]).at(0);
+		char varLeft = string(m[1]).at(0);
+		string midOpr = string(m[2]);
+		char varRight = string(m[3]).at(0);
+		left = varLeft;
+		right = varRight;
 		return true;//有未知数组成
 	}
 	bool isConditionOk() const {

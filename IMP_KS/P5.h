@@ -188,7 +188,6 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 				temp.from = 0;
 				temp.to = end_no;
 				insert(ways,temp);
-				//ways.push_back(temp);
 				que.push(ver);
 				while (!que.empty())
 				{
@@ -204,7 +203,6 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 				temp.from = 0;
 				temp.to = end_no;
 				insert(ways, temp);
-				//ways.push_back(temp);
 			}
 		}
 		else
@@ -235,11 +233,15 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 			{
 				Variables tempvs;
 				nextVars(tempvs,in[i][j]);
-				char newy;
-				bool yes=in[i][j].conditionval(newy);
+				char newy='0';
+				char newz='0';
+				bool yes=in[i][j].conditionval(newy,newz);
 				if (yes == true)
 				{
+					if(!(newy>='0'&&newy<='9'))
 					changeValue(all_var,newy,0);
+					if (!(newz >= '0'&&newz <= '9'))
+					changeValue(all_var, newy, 0);
 				}
 				for(int k=0;k<in[i][j].vars.size();k++)
 				{
@@ -267,7 +269,7 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 		begin.all_var = all_var;
 		begin.pcs = pc;
 		dfs_search(begin,in,0);
-		cout << nodes.size()<<"--------"<<ways.size() <<endl;
+		//cout << nodes.size()<<"--------"<<ways.size() <<endl;
 
 		ostringstream sout;
 		sout << "var nodeDataArray = " << endl;

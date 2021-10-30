@@ -1,4 +1,4 @@
-(x=0;
+x=0;
 y=2;
 if x<y then
     while x<2 do
@@ -6,4 +6,4 @@ if x<y then
     endwhile;
 else 
     y=y+1;
-endif;)
+endif;
