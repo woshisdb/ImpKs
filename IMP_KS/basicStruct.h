@@ -189,7 +189,34 @@ public:
 
 		return true;
 	}
+	bool conditionval(char &yes) {
+		if (condition.empty())
+			return false;
+		if (condition == "true")
+			return false;
+		if (condition == "false")
+			return false;
 
+		bool hasNot = false;
+		string conditionNew = condition;
+		if (conditionNew.find("not") != -1) {
+			hasNot = true;
+			conditionNew = remove(conditionNew, "not");
+			conditionNew = trimmed(conditionNew);
+		}
+
+		if (conditionNew == "true")
+			return false;
+		if (conditionNew == "false")
+			return false;
+
+		std::regex re("(\\w)\\s*([><=andotr]+)\\s*(\\w)");
+		std::smatch m;
+		assert(std::regex_search(conditionNew, m, re));
+
+		yes = string(m[1]).at(0);
+		return true;//有未知数组成
+	}
 	bool isConditionOk() const {
 		if (condition.empty())
 			return true;

@@ -1,12 +1,9 @@
-(cobegin P0||P1 coend;
-P0::
-while true do
-    wait(t==0);
-    t=1; 
+x=y+1; 
+z=z+2;
+while y<2 do
+    if x<y then 
+        x=x+1; 
+    else 
+        y=y+1;
+    endif;
 endwhile;
-
-P1::
-while true do
-    wait(t==1);
-    t=0; 
-endwhile;)

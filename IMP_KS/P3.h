@@ -30,10 +30,8 @@ public:
 		vector<FirstOrderLogical> list;
 		for (int i = 0; i < statements.size(); ++i) {
 			Statement postSm = out;
-			//Statement sm=statements[i];
 			Statement sm = statements[i];
 			if (i + 1 < statements.size()) {
-				//postSm = statements.at(i + 1);
 				postSm = statements[i + 1];
 			}
 

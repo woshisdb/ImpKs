@@ -155,11 +155,23 @@ bool P1::parseStatements(const string& input, Statements& statements) {
 	int e = 0;
 	while (s < input.length())
 	{
-		int pos = input.find("if", s);
-		if (pos == -1) {
-			pos = input.find("while", s);
+		int pos1 = input.find("if", s);
+		int pos2 = input.find("while", s);
+		int pos;
+		if (pos1 == -1)
+		{
+			pos = pos2;
 		}
-		if (-1 == pos) {
+		else if(pos2==-1)
+		{
+			pos = pos1;
+		}
+		else
+		{
+			pos = min(pos1, pos2);
+		}
+		if (pos1==-1&&pos2==-1)//¶¼Ã»ÕÒµ½
+		{
 			e = input.length();
 			string inputSplit = input.substr(s, e - s);
 			auto states_tmp = parseSequence(inputSplit);

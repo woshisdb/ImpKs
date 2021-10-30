@@ -46,6 +46,14 @@ bool equal(node u,node v)
 typedef struct len{
 	int from;
 	int to;
+	bool equal(len res)
+	{
+		if (from == res.from&&to == res.to)
+		{
+			return true;
+		}
+		return false;
+	}
 };
 int find(vector<node> nodes,node nod)
 {
@@ -61,6 +69,21 @@ int find(vector<node> nodes,node nod)
 vector<node> nodes;
 vector<len> ways;
 queue<node> que;
+void insert(vector<len> &ways,len now)
+{
+	int yes=false;
+	for (auto& v : ways)
+	{
+		if (v.equal(now) == true)
+		{
+			yes = true;
+		}
+	}
+	if (yes == false)
+	{
+		ways.push_back(now);
+	}
+}
 class P5 {
 public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(PC{pc0})
 	void nextVars(const Variables& src, FirstOrderLogical &dst) {
@@ -112,7 +135,8 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 						len a2b;
 						a2b.from=origin_node;
 						a2b.to = no;
-						ways.push_back(a2b);
+						insert(ways,a2b);
+						//ways.push_back(a2b);
 					}
 					else//��Ҫ�ж�ת��
 					{
@@ -131,7 +155,8 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 							len a2b;
 							a2b.from = origin_node;
 							a2b.to = no;
-							ways.push_back(a2b);
+							insert(ways, a2b);
+							//ways.push_back(a2b);
 						}
 					}
 				}
@@ -162,7 +187,8 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 				len temp;
 				temp.from = 0;
 				temp.to = end_no;
-				ways.push_back(temp);
+				insert(ways,temp);
+				//ways.push_back(temp);
 				que.push(ver);
 				while (!que.empty())
 				{
@@ -177,7 +203,8 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 				len temp;
 				temp.from = 0;
 				temp.to = end_no;
-				ways.push_back(temp);
+				insert(ways, temp);
+				//ways.push_back(temp);
 			}
 		}
 		else
@@ -208,7 +235,12 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 			{
 				Variables tempvs;
 				nextVars(tempvs,in[i][j]);
-				//in[i][j].vars = tempvs;
+				char newy;
+				bool yes=in[i][j].conditionval(newy);
+				if (yes == true)
+				{
+					changeValue(all_var,newy,0);
+				}
 				for(int k=0;k<in[i][j].vars.size();k++)
 				{
 					bool yes = false;
