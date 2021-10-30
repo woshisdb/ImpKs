@@ -3,7 +3,6 @@
 #include"P1.h"
 #include"P2.h"
 #include"P3.h"
-#include"P4.h"
 #include"P5.h"
 #include "basic_method.h"
 #include <iostream>
@@ -163,19 +162,7 @@ string ImpKs::getFirstOrderLogic(vector<Statements>& statements, vector<vector<F
 	return logic_code;
 }
 
-void ImpKs::getKripkeStructure(vector<vector<FirstOrderLogical>>& lgss)
-{
-	P4 program3;
-	vector<string> pcs;
-	vector<pair<string, string>> relations;
-	vector<string> lables;
-	vector<FirstOrderLogical> lastLgs;
-	vector<string> states;
-	vector<KsR> Rs;
-	Variables vars;
-	program3.to_label(lgss, pcs, relations, lables, lastLgs, states, Rs, vars);
-	program3.createKsLables(lgss, pcs, relations, lables, lastLgs, vars, states, Rs);
-}
+
 
 string ImpKs::getDrawJson(vector<vector<FirstOrderLogical>>& lgss)
 {
@@ -206,8 +193,8 @@ void ImpKs::run(string code)
 	string logic_code = getFirstOrderLogic(statements, lgss);
 	cout << logic_code << endl;
 
-	cout << "\n第四步：创建Kripke Structure" << endl;
-	getKripkeStructure(lgss);
+	//cout << "\n第四步：创建Kripke Structure" << endl;
+	//getKripkeStructure(lgss);
 
 	cout << "\n第五步：生成绘图json数据" << endl;
 	string gojs = getDrawJson(lgss);

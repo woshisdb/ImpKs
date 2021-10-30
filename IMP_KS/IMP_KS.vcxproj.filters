@@ -33,9 +33,6 @@
     <ClInclude Include="P3.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="P4.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="P5.h">
       <Filter>头文件</Filter>
     </ClInclude>

@@ -193,10 +193,8 @@ public:
 	bool isConditionOk() const {
 		if (condition.empty())
 			return true;
-		//if (0 == condition.compare("true", Qt::CaseInsensitive))
 		if (condition == "true")
 			return true;
-		//if (0 == condition.compare("false", Qt::CaseInsensitive))
 		if (condition == "false")
 			return false;
 
@@ -204,7 +202,6 @@ public:
 		string conditionNew = condition;
 		if (conditionNew.find("not") != -1) {
 			hasNot = true;
-			//conditionNew.remove("not");
 			conditionNew = remove(conditionNew, "not");
 			conditionNew = trimmed(conditionNew);
 		}

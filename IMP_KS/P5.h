@@ -6,7 +6,6 @@
 #include<sstream>
 #include"basic_method.h"
 #include"basicStruct.h"
-#include"P4.h"
 using namespace std;
 typedef struct node{
 	vector<string> pcs;
@@ -64,7 +63,14 @@ vector<len> ways;
 queue<node> que;
 class P5 {
 public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(PC{pc0})
+	void nextVars(const Variables& src, FirstOrderLogical &dst) {
+		dst.vars.clear();
+		dst.vars = src;
+		pair<char, int> pir = dst.assign();
 
+		if (!(pir.first == NULL))
+			changeValue(dst.vars, pir.first, pir.second);
+	}
 	void changeValue(Variables &vars, char var, int value) {
 		bool find = false;
 		for (auto& v : vars) {
@@ -75,7 +81,6 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 			}
 		}
 		if (!find)
-			//vars << Variable{ Variable::Int, var, value };
 			vars.push_back(Variable{ Variable::Int, var, value });
 	}
 	void bfs(node beg, vector<vector<FirstOrderLogical>> &in)
@@ -193,6 +198,9 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 		{
 			for (int j = 0; j < in[i].size(); j++)
 			{
+				Variables tempvs;
+				nextVars(tempvs,in[i][j]);
+				//in[i][j].vars = tempvs;
 				for(int k=0;k<in[i][j].vars.size();k++)
 				{
 					bool yes = false;
