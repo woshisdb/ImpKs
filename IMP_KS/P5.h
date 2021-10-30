@@ -155,21 +155,29 @@ public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(P
 				nodes.push_back(star);//放入第0个节点
 			}
 			node ver = beg;
-			nodes.push_back(ver);
-			//if (beg.pcs.size() > 1)//表示并行
-			//{
-				int end_no=find(nodes, ver);
+			if (find(nodes,ver)==-1)
+			{
+				nodes.push_back(ver);
+				int end_no = find(nodes, ver);
 				len temp;
 				temp.from = 0;
 				temp.to = end_no;
 				ways.push_back(temp);
-			//}
-			que.push(ver);
-			while(!que.empty())
+				que.push(ver);
+				while (!que.empty())
+				{
+					node temp = que.front();
+					que.pop();
+					bfs(temp, in);
+				}
+			}
+			else
 			{
-				node temp = que.front();
-				que.pop();
-				bfs(temp,in);
+				int end_no = find(nodes, ver);
+				len temp;
+				temp.from = 0;
+				temp.to = end_no;
+				ways.push_back(temp);
 			}
 		}
 		else

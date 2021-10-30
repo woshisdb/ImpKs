@@ -1,6 +1,5 @@
 (cobegin P0||P1 coend;
 P0::
-t=0;
 while true do
     wait(t==0);
     t=1; 
