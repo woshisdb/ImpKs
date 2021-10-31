@@ -1,3 +1,18 @@
+(cobegin P0||P1 coend;
+P0::
+if x<2 then
+while x<2 do
+while y<2 do
+    if x<y then 
+        x=x+1; 
+    else 
+        y=y+1;
+    endif;
+endwhile;
+x=x+1;
+endwhile;
+else
+while y<2 do
 if x<y then
     while x<2 do
         x=x+1;
@@ -5,3 +20,18 @@ if x<y then
 else 
     y=y+1;
 endif;
+y=y+1;
+endwhile;
+endif;
+
+P1::
+while y<2 do
+if x<y then
+    while x<2 do
+        x=x+1;
+    endwhile;
+else 
+    y=y+1;
+endif;
+y=y+1;
+endwhile;)

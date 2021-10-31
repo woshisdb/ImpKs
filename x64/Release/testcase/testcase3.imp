@@ -1,12 +1,9 @@
-x=0;
-y=0;
-z=0;
 x=y+1; 
 z=z+2;
 while y<2 do
     if x<y then 
         x=x+1; 
     else 
-        y=y+1;
+        y=y-1;
     endif;
 endwhile;
