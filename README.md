@@ -1,5 +1,22 @@
 # IMP程序转KripkeStructure
 
+- [IMP程序转KripkeStructure](#imp程序转kripkestructure)
+  - [1 可执行程序](#1-可执行程序)
+  - [2 编译环境](#2-编译环境)
+  - [3 测试用例（同步程序）](#3-测试用例同步程序)
+    - [3.1 IMP程序](#31-imp程序)
+    - [3.2 KripkeStructure图](#32-kripkestructure图)
+    - [3.3 终端输出](#33-终端输出)
+  - [4 测试用例（异步程序）](#4-测试用例异步程序)
+    - [4.1 IMP程序](#41-imp程序)
+    - [4.2 KripkeStructure图](#42-kripkestructure图)
+    - [4.3 终端输出](#43-终端输出)
+  - [5 测试用例（复杂异步程序）](#5-测试用例复杂异步程序)
+    - [5.1 IMP程序](#51-imp程序)
+    - [5.2 KripkeStructure图](#52-kripkestructure图)
+    - [5.3 终端输出](#53-终端输出)
+
+
 ## 1 可执行程序
 - 可执行程序路径：./x64/Release/IMP_KS.exe
 - 执行命令如下：
@@ -13,8 +30,66 @@ IMP_KS.exe ./testcase/testcase5.imp
 - Visual Studio 2017及以上版本
 - 安装指导：http://c.biancheng.net/view/456.html
 
-## 3 测试用例
+## 3 测试用例（同步程序）
 ### 3.1 IMP程序
+```cpp
+a=1;
+```
+
+### 3.2 KripkeStructure图
+
+![状态图](./output/output0.png)
+
+### 3.3 终端输出
+```
+D:\GitHub\IMP_KS\x64\Release>IMP_KS.exe ./testcase/testcase1.imp
+Start IMPtoKS
+
+第零步：原始IMP程序
+a=1;
+
+第一步：词法分析
+a=1;
+
+第二步：打标签
+输出打标签的函数：
+P1:
+L0_1:a=1;
+L0E
+
+
+
+第三步：一阶逻辑公式
+First order logical formula:
+pc=L0_m ∧ pc'=L0_1
+pc=L0_1 ∧ pc'=L0E ∧ (a=1) ∧ SAME(V\{a})
+
+
+第四步：创建Kripke Structure(json数据)
+var nodeDataArray =
+[{"id":0,"text":"null ,","category":"Start"}
+,{"id":1,"text":"L0_1 ,a=0 "}
+,{"id":2,"text":"L0E ,a=1 "}
+,{"id":3,"text":"L0_1 ,a=1 "}
+,{"id":4,"text":"L0_1 ,a=2 "}
+]
+var linkDataArray =
+[{"from":0,"to":1}
+,{"from":1,"to":2}
+,{"from":0,"to":3}
+,{"from":3,"to":2}
+,{"from":0,"to":4}
+,{"from":4,"to":2}
+]
+
+第五步：浏览器自动打开显示状态图
+
+D:\GitHub\IMP_KS\x64\Release>pause
+请按任意键继续. . .
+```
+
+## 4 测试用例（异步程序）
+### 4.1 IMP程序
 ```cpp
 (cobegin P0||P1 coend;
 P0::
@@ -31,11 +106,11 @@ while true do
 endwhile;)
 ```
 
-### 3.2 KripkeStructure图
+### 4.2 KripkeStructure图
 
-![状态图](./output.png)
+![状态图](./output/output1.png)
 
-### 3.3 终端输出
+### 4.3 终端输出
 ```
 D:\MyProject\IMP_KS\x64\Release>IMP_KS.exe ./testcase/testcase5.imp
 Start IMPtoKS
@@ -66,7 +141,6 @@ L1E
 
 
 第三步：一阶逻辑公式
-First order logical formula:
 pc=l ∧ pc'= ⊥ ∧ pc'0=L0_m ∧ pc'1=L1_m
 pc0=L0_1 ∧ pc0'=L0_3 ∧ (true) ∧ SAME(V) ∧ SAME(PC{pc0})
 pc0=L0_3 ∧ pc0'=L0_3 ∧ (not t==0) ∧ SAME(V) ∧ SAME(PC{pc0})
@@ -144,8 +218,8 @@ D:\MyProject\IMP_KS\x64\Release>pause
 请按任意键继续. . .
 ```
 
-## 4 测试用例二
-### 4.1 IMP程序
+## 5 测试用例（复杂异步程序）
+### 5.1 IMP程序
 ```cpp
 (cobegin P0||P1 coend;
 P0::
@@ -186,11 +260,11 @@ y=y+1;
 endwhile;)
 ```
 
-### 4.2 KripkeStructure图
+### 5.2 KripkeStructure图
 
-![状态图](./output2.png)
+![状态图](./output/output2.png)
 
-### 4.3 终端输出
+### 5.3 终端输出
 ```
 D:\MyProject\IMP_KS\x64\Release>IMP_KS.exe ./testcase/testcase6.imp
 Start IMPtoKS
@@ -246,7 +320,6 @@ L1E
 
 
 第三步：一阶逻辑公式
-First order logical formula:
 pc=l ∧ pc'= ⊥ ∧ pc'0=L0_m ∧ pc'1=L1_m
 pc0=L0_1 ∧ pc0'=L0_3 ∧ (x<2) ∧ SAME(V) ∧ SAME(PC{pc0})
 pc0=L0_3 ∧ pc0'=L0_5 ∧ (x<2) ∧ SAME(V) ∧ SAME(PC{pc0})
