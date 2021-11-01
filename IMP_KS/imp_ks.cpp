@@ -154,12 +154,17 @@ string ImpKs::getLabelCode(vector<Statements>& statements)
 	return label_code;
 }
 
-string ImpKs::getFirstOrderLogic(vector<Statements>& statements, vector<vector<FirstOrderLogical>>& fols)
+string ImpKs::getFirstOrderLogic(const vector<Statements>& statements, vector<vector<FirstOrderLogical>>& fols)
 {
 	P3 program_3;
-	string logic_code;
-	fols = program_3.to_logic(statements, logic_code);
-	return logic_code;
+	string logicFormula;
+	if (statements.size() > 1) {
+		logicFormula = program_3.GetConcurrentFirstOrderLogicFormula(statements, fols);
+	}
+	else {
+		logicFormula = program_3.GetFirstOrderLogicFormula(statements, fols);
+	}
+	return logicFormula;
 }
 
 

@@ -7,8 +7,69 @@ using namespace std;
 class P3 {
 public:
 
+	string GetConcurrentFirstOrderLogicFormula(const vector<Statements>& statements, vector<vector<FirstOrderLogical>>& fols)
+	{
+		string logicFormula = "";
+		string beg;
+		beg = "pc=l ∧ pc'= ⊥";
+		for (int i = 0; i < statements.size(); i++)
+		{
+			beg += " ∧ pc'" + to_string(i) + "=L" + to_string(i) + "_m";
+		}
+		beg += "\n";
+		logicFormula.append(beg);
+
+		for (int i = 0; i < statements.size(); ++i) {
+			Statement out;
+			vector<FirstOrderLogical> formulas = toFormula(statements[i], out);
+			fols.push_back(formulas);
+
+			for (const auto& v : formulas) {
+				string pc = formatString("pc%d", i);
+				string formulaNew = v.toString();
+				formulaNew.replace(formulaNew.find("pc"), 2, pc);
+				formulaNew.replace(formulaNew.find("pc'"), 2, pc);
+				formulaNew.append(formatString(" ∧ SAME(PC\{%s})", pc.c_str()));
+				logicFormula.append(formulaNew);
+				logicFormula.append("\n");
+			}
+		}
+
+		string end;
+		end = "pc=⊥ ∧ pc'=l'";
+		for (int i = 0; i < statements.size(); i++)
+		{
+			end.append(" ∧ pc" + to_string(i) + "=L" + to_string(i) + "E" + " ∧ pc" + to_string(i) + "'" + "=⊥");
+		}
+		end += "\n";
+		logicFormula.append(end);
+
+		return logicFormula;
+	}
+
+	string GetFirstOrderLogicFormula(const vector<Statements>& statements, vector<vector<FirstOrderLogical>>& fols)
+	{
+		string logicFormula = "";
+		string beg;
+		beg = "pc=L0_m ∧ pc'=L0_1\n";
+		logicFormula.append(beg);
+
+		for (int i = 0; i < statements.size(); ++i) {
+			Statement out;
+			vector<FirstOrderLogical> formulas = toFormula(statements[i], out);
+			fols.push_back(formulas);
+
+			for (const auto& v : formulas) {
+				logicFormula.append(v.toString());
+				logicFormula.append("\n");
+			}
+		}
+		return logicFormula;
+	}
+
+private:
 	//将关联语句转换为逻辑公式
-	static FirstOrderLogical toFormula(const Statement& pre, const Statement& post) {
+	FirstOrderLogical toFormula(const Statement& pre, const Statement& post) {
 		FirstOrderLogical lg;
 		lg.preLable = pre.label;
 		lg.postLable = post.label;
@@ -68,73 +129,6 @@ public:
 			}
 		}
 		return list;
-	}
-
-
-	vector<vector<FirstOrderLogical>> to_logic(vector<Statements> statements, string &logic_code)
-	{
-		logic_code.append("First order logical formula:\n");
-		//string logic_code;
-		vector<vector<FirstOrderLogical>> fols;
-		bool hasPc = statements.size() > 1;
-
-		if (hasPc == false)
-		{
-			//开始状态
-			string beg;
-			beg = "pc=L0_m ∧ pc'=L0_1\n";
-			logic_code.append(beg);
-		}
-		else
-		{
-			string beg;
-			beg = "pc=l ∧ pc'= ⊥";//pc1'= l∧...∧pcn'= ln∧
-			for (int i = 0; i < statements.size(); i++)
-			{
-				beg += " ∧ pc'" + to_string(i) + "=L" + to_string(i) + "_m";
-			}
-			beg += "\n";
-			logic_code.append(beg);
-		}
-		for (int i = 0; i < statements.size(); ++i) {
-			Statement out;
-			vector<FirstOrderLogical> formulas = toFormula(statements[i], out);
-			fols.push_back(formulas);
-
-			for (const auto& v : formulas) {
-				if (hasPc) {//多进程
-
-					string pc = formatString("pc%d", i);
-					string formulaNew = v.toString();
-					formulaNew.replace(formulaNew.find("pc"), 2, pc);
-					formulaNew.replace(formulaNew.find("pc'"), 2, pc);
-					formulaNew.append(formatString(" ∧ SAME(PC\{%s})", pc.c_str()));
-					logic_code.append(formulaNew);
-					//logic_code.append(formatString("pc=%s ∧ %s", pc.c_str(), formulaNew.c_str()));
-
-				}
-				else
-					logic_code.append(v.toString());
-
-				logic_code.append("\n");
-
-
-
-			}
-			//
-		}
-		if (hasPc == true)
-		{
-			string end;
-			end = "pc=⊥ ∧ pc'=l'";
-			for (int i = 0; i < statements.size(); i++)
-			{
-				end.append(" ∧ pc" + to_string(i) + "=L" + to_string(i) + "E" + " ∧ pc" + to_string(i) + "'" + "=⊥");
-			}
-			end += "\n";
-			logic_code.append(end);
-		}
-		return fols;
 	}
 
 };

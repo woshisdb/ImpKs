@@ -162,7 +162,7 @@ public:
 		inputNew = remove(inputNew, "\n");
 		string condition, ifBody, elseBody;
 		/*
-		if (input.find("else") != -1) {///////////////////不对啊？？？？？？？？？？？？？？？？？？？
+		if (input.find("else") != -1) {
 			std::regex re("if(.+?)then(.+)else(.+)endif;"); // TODO: multiline
 			std::smatch m;
 			assert(std::regex_search(inputNew, m, re));
@@ -171,7 +171,7 @@ public:
 			elseBody = trimmed(string(m[3]));
 		}
 		*/
-		if (input.find("else") != -1) {///////////////////不对啊？？？？？？？？？？？？？？？？？？？
+		if (input.find("else") != -1) {
 			std::regex re("if(.+?)then(.+)endif;"); // TODO: multiline
 			std::smatch m;
 			assert(std::regex_search(inputNew, m, re));
