@@ -1,2 +1,7 @@
 .vs/*
 *Debug*
+*.tlog
+*pdb
+*.iobj
+*.obj
+*.log

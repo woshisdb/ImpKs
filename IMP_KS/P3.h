@@ -75,7 +75,7 @@ public:
 	{
 		logic_code.append("First order logical formula:\n");
 		//string logic_code;
-		vector<vector<FirstOrderLogical>> lgss;
+		vector<vector<FirstOrderLogical>> fols;
 		bool hasPc = statements.size() > 1;
 
 		if (hasPc == false)
@@ -99,7 +99,7 @@ public:
 		for (int i = 0; i < statements.size(); ++i) {
 			Statement out;
 			vector<FirstOrderLogical> formulas = toFormula(statements[i], out);
-			lgss.push_back(formulas);
+			fols.push_back(formulas);
 
 			for (const auto& v : formulas) {
 				if (hasPc) {//¶à½ø³Ì
@@ -134,7 +134,7 @@ public:
 			end += "\n";
 			logic_code.append(end);
 		}
-		return lgss;
+		return fols;
 	}
 
 };

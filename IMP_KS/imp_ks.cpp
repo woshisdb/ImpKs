@@ -154,20 +154,20 @@ string ImpKs::getLabelCode(vector<Statements>& statements)
 	return label_code;
 }
 
-string ImpKs::getFirstOrderLogic(vector<Statements>& statements, vector<vector<FirstOrderLogical>>& lgss)
+string ImpKs::getFirstOrderLogic(vector<Statements>& statements, vector<vector<FirstOrderLogical>>& fols)
 {
 	P3 program_3;
 	string logic_code;
-	lgss = program_3.to_logic(statements, logic_code);
+	fols = program_3.to_logic(statements, logic_code);
 	return logic_code;
 }
 
 
 
-string ImpKs::getKripkeStructureJson(vector<vector<FirstOrderLogical>>& lgss)
+string ImpKs::getKripkeStructureJson(vector<vector<FirstOrderLogical>>& fols)
 {
 	P4 program_4;
-	string gojs = program_4.change(lgss);
+	string gojs = program_4.change(fols);
 	ofstream fout("./view/show_data.js");
 	fout << gojs << endl;
 	return gojs;
@@ -189,12 +189,12 @@ void ImpKs::run(string code)
 	cout << label_code << endl;
 
 	cout << "\n第三步：一阶逻辑公式" << endl;
-	vector<vector<FirstOrderLogical>> lgss;
-	string logic_code = getFirstOrderLogic(statements, lgss);
+	vector<vector<FirstOrderLogical>> fols;
+	string logic_code = getFirstOrderLogic(statements, fols);
 	cout << logic_code << endl;
 
 	cout << "\n第四步：创建Kripke Structure(json数据)" << endl;
-	string gojs = getKripkeStructureJson(lgss);
+	string gojs = getKripkeStructureJson(fols);
 	cout << gojs << endl;
 
 	cout << "\n第五步：浏览器自动打开显示状态图" << endl;
