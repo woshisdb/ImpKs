@@ -60,7 +60,6 @@ L0E
 
 
 第三步：一阶逻辑公式
-First order logical formula:
 pc=L0_m ∧ pc'=L0_1
 pc=L0_1 ∧ pc'=L0E ∧ (a=1) ∧ SAME(V\{a})
 
