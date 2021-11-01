@@ -16,8 +16,7 @@ public:
 	void lexicalAnalysis(const string& code, vector<Statements>& statements);
 	string getLabelCode(vector<Statements>& statements);
 	string getFirstOrderLogic(vector<Statements>& statements, vector<vector<FirstOrderLogical>>& lgss);
-	void getKripkeStructure(vector<vector<FirstOrderLogical>>& lgss);
-	string getDrawJson(vector<vector<FirstOrderLogical>>& lgss);
+	string getKripkeStructureJson(vector<vector<FirstOrderLogical>>& lgss);
 	void run(string code);
 
 

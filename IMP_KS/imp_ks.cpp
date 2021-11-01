@@ -3,7 +3,7 @@
 #include"P1.h"
 #include"P2.h"
 #include"P3.h"
-#include"P5.h"
+#include"P4.h"
 #include "basic_method.h"
 #include <iostream>
 #include <string>
@@ -130,8 +130,8 @@ void draw_json(vector<json_node> h, vector<edge> eg)
 void ImpKs::lexicalAnalysis(const string& code, vector<Statements>& statements)
 {
 	//解析出所有程序段
-	P1 program_0;
-	vector<string> processes = program_0.parseCoProcesses(code);
+	P1 program_1;
+	vector<string> processes = program_1.parseCoProcesses(code);
 
 	for (int i = 0; i < processes.size(); i++) {
 		cout << processes[i] << endl;
@@ -139,7 +139,7 @@ void ImpKs::lexicalAnalysis(const string& code, vector<Statements>& statements)
 
 	for (const auto& v : processes) {
 		Statements tmp;//对每个程序p1,p2分别处理
-		program_0.parseStatements(v, tmp);
+		program_1.parseStatements(v, tmp);
 		statements.push_back(tmp);
 	}
 }
@@ -147,27 +147,27 @@ void ImpKs::lexicalAnalysis(const string& code, vector<Statements>& statements)
 string ImpKs::getLabelCode(vector<Statements>& statements)
 {
 	//给所有语句打上标签
-	P2 program_1;
-	program_1.createlabel(statements);
+	P2 program_2;
+	program_2.createlabel(statements);
 	string label_code;
-	program_1.show_codes(statements, label_code);
+	program_2.show_codes(statements, label_code);
 	return label_code;
 }
 
 string ImpKs::getFirstOrderLogic(vector<Statements>& statements, vector<vector<FirstOrderLogical>>& lgss)
 {
-	P3 program_2;
+	P3 program_3;
 	string logic_code;
-	lgss = program_2.to_logic(statements, logic_code);
+	lgss = program_3.to_logic(statements, logic_code);
 	return logic_code;
 }
 
 
 
-string ImpKs::getDrawJson(vector<vector<FirstOrderLogical>>& lgss)
+string ImpKs::getKripkeStructureJson(vector<vector<FirstOrderLogical>>& lgss)
 {
-	P5 sa;
-	string gojs = sa.change(lgss);
+	P4 program_4;
+	string gojs = program_4.change(lgss);
 	ofstream fout("./view/show_data.js");
 	fout << gojs << endl;
 	return gojs;
@@ -193,14 +193,11 @@ void ImpKs::run(string code)
 	string logic_code = getFirstOrderLogic(statements, lgss);
 	cout << logic_code << endl;
 
-	//cout << "\n第四步：创建Kripke Structure" << endl;
-	//getKripkeStructure(lgss);
-
-	cout << "\n第五步：生成绘图json数据" << endl;
-	string gojs = getDrawJson(lgss);
+	cout << "\n第四步：创建Kripke Structure(json数据)" << endl;
+	string gojs = getKripkeStructureJson(lgss);
 	cout << gojs << endl;
 
-	cout << "\n第六步：浏览器自动打开显示状态图" << endl;
+	cout << "\n第五步：浏览器自动打开显示状态图" << endl;
 	string cmd = "start ./view/stateChart.html";
 	const char* command = cmd.c_str();
 	system(command);

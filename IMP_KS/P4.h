@@ -84,7 +84,7 @@ void insert(vector<len> &ways,len now)
 		ways.push_back(now);
 	}
 }
-class P5 {
+class P4 {
 public://pc0=L0_1 �� pc0'=L0_2 �� (t=0) �� SAME(V\{t}) �� SAME(PC{pc0})
 	void nextVars(const Variables& src, FirstOrderLogical &dst) {
 		dst.vars.clear();
